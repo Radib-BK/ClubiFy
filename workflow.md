@@ -50,7 +50,7 @@ accounts   → imports nothing from project apps
 | # | Checkpoint | Branch | Status |
 |---|------------|--------|--------|
 | 0.1 | Architecture design documented | — | ✅ |
-| 0.2 | Git init + .gitignore | `main` | 🔄 |
+| 0.2 | Git init + .gitignore | `main` | ✅ |
 
 **0.2 Commits:**
 - `chore: initialize repository with project documentation`
@@ -61,7 +61,7 @@ accounts   → imports nothing from project apps
 
 | # | Checkpoint | Branch | Status |
 |---|------------|--------|--------|
-| 1.1 | Django project + `accounts` app (signup/login/logout) | `feature/auth` | ⬜ |
+| 1.1 | Django project + `accounts` app (signup/login/logout) | `feature/auth` | 🔄 |
 | 1.2 | `Club` model + admin registration | `feature/clubs` | ⬜ |
 | 1.3 | Club create view + form | `feature/clubs` | ⬜ |
 | 1.4 | Club list page | `feature/clubs` | ⬜ |
@@ -129,19 +129,6 @@ accounts   → imports nothing from project apps
 - `test(posts): add post creation permission tests`
 - `test: add happy-path integration test`
 - `docs: complete README with setup instructions`
-
----
-
-## Progress
-
-| Day | Done | Total |
-|-----|------|-------|
-| 0 | 1 | 2 |
-| 1 | 0 | 5 |
-| 2 | 0 | 5 |
-| 3 | 0 | 5 |
-| 4 | 0 | 3 |
-| **Total** | **1** | **20** |
 
 ---
 
