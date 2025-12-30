@@ -1,0 +1,13 @@
+{
+  "name": "clubify",
+  "version": "1.0.0",
+  "description": "ClubiFy - Django club management app",
+  "scripts": {
+    "tailwind": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css",
+    "tailwind:watch": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch",
+    "tailwind:build": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --minify"
+  },
+  "keywords": ["django", "tailwindcss"],
+  "license": "MIT"
+}
+

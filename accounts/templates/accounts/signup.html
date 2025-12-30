@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="w-full max-w-md">
+        <div class="card p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900">Create your account</h1>
+                <p class="text-gray-600 mt-2">Join ClubiFy and discover amazing clubs</p>
+            </div>
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="id_username" class="label">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_email" class="label">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_password1" class="label">Password</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_password2" class="label">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="bg-red-100 text-red-800 rounded-lg p-3">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-sm">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary w-full">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="text-center text-gray-600 mt-6">
+                Already have an account? 
+                <a href="{% url 'accounts:login' %}" class="text-primary-600 hover:text-primary-700 font-medium">
+                    Log in
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
