@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     # Project apps
     'accounts',
     'clubs',
+    'memberships',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Membership Requests - {{ club.name }} - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900 text-sm">
+            ⬅️ Back to {{ club.name }}
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-4">Membership Requests</h1>
+        <p class="text-gray-600 mt-1">{{ pending_requests.count }} pending request{{ pending_requests.count|pluralize }}</p>
+    </div>
+
+    <!-- Pending Requests List -->
+    <div class="card divide-y divide-gray-100">
+        {% for req in pending_requests %}
+        <div class="p-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <span class="text-yellow-700 font-medium">
+                        {{ req.user.username|slice:":1"|upper }}
+                    </span>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">{{ req.user.username }}</p>
+                    <p class="text-sm text-gray-500">Requested {{ req.requested_at|timesince }} ago</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <!-- Approve/Reject buttons will be functional in checkpoint 2.3 -->
+                <span class="btn btn-success text-sm opacity-50 cursor-not-allowed">
+                    Approve
+                </span>
+                <span class="btn btn-danger text-sm opacity-50 cursor-not-allowed">
+                    Reject
+                </span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="p-8 text-center text-gray-500">
+            <p>🎉 No pending requests!</p>
+            <p class="text-sm mt-1">All membership requests have been processed.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

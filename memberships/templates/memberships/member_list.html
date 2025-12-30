@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Members - {{ club.name }} - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900 text-sm">
+            ⬅️ Back to {{ club.name }}
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-4">Members</h1>
+        <p class="text-gray-600 mt-1">{{ members.count }} member{{ members.count|pluralize }} in {{ club.name }}</p>
+    </div>
+
+    <!-- Members List -->
+    <div class="card divide-y divide-gray-100">
+        {% for member in members %}
+        <div class="p-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span class="text-primary-700 font-medium">
+                        {{ member.user.username|slice:":1"|upper }}
+                    </span>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">{{ member.user.username }}</p>
+                    <p class="text-sm text-gray-500">Joined {{ member.joined_at|date:"M j, Y" }}</p>
+                </div>
+            </div>
+            <span class="px-3 py-1 text-xs font-medium rounded-full 
+                {% if member.role == 'admin' %}bg-primary-100 text-primary-700
+                {% elif member.role == 'moderator' %}bg-purple-100 text-purple-700
+                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                {{ member.get_role_display }}
+            </span>
+        </div>
+        {% empty %}
+        <div class="p-8 text-center text-gray-500">
+            No members yet.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

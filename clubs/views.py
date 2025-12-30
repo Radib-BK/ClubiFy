@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 
 from .models import Club
 from .forms import ClubForm
+from memberships.models import Membership, MembershipRequest, RoleChoices, RequestStatus
 
 
 class ClubListView(ListView):
@@ -13,7 +14,7 @@ class ClubListView(ListView):
     model = Club
     template_name = 'clubs/club_list.html'
     context_object_name = 'clubs'
-    paginate_by = 6
+    paginate_by = 12
 
 
 class ClubDetailView(DetailView):
@@ -22,6 +23,34 @@ class ClubDetailView(DetailView):
     template_name = 'clubs/club_detail.html'
     context_object_name = 'club'
     slug_url_kwarg = 'slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        club = self.object
+        user = self.request.user
+
+        # Default values for guests
+        context['is_member'] = False
+        context['membership'] = None
+        context['pending_request'] = None
+        context['member_count'] = club.memberships.count()
+
+        if user.is_authenticated:
+            # Check if user is a member
+            membership = Membership.objects.filter(user=user, club=club).first()
+            if membership:
+                context['is_member'] = True
+                context['membership'] = membership
+
+            # Check if user has a pending request
+            pending = MembershipRequest.objects.filter(
+                user=user, 
+                club=club, 
+                status=RequestStatus.PENDING
+            ).first()
+            context['pending_request'] = pending
+
+        return context
 
 
 class ClubCreateView(LoginRequiredMixin, CreateView):
@@ -35,8 +64,12 @@ class ClubCreateView(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         response = super().form_valid(form)
         
-        # Note: In checkpoint 2.1, we'll also create a Membership here
-        # to make the creator an admin of the club
+        # Create admin membership for the creator
+        Membership.objects.create(
+            user=self.request.user,
+            club=self.object,
+            role=RoleChoices.ADMIN
+        )
         
         messages.success(
             self.request, 
@@ -46,4 +79,3 @@ class ClubCreateView(LoginRequiredMixin, CreateView):
     
     def get_success_url(self):
         return self.object.get_absolute_url()
-

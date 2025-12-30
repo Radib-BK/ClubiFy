@@ -65,7 +65,7 @@ accounts   → imports nothing from project apps
 | 1.2 | `Club` model + admin registration | `feature/clubs` | ✅ |
 | 1.3 | Club create view + form | `feature/clubs` | ✅ |
 | 1.4 | Club list page | `feature/clubs` | ✅ |
-| 1.5 | Club detail page | `feature/clubs` | 🔄 |
+| 1.5 | Club detail page | `feature/clubs` | ✅ |
 
 **1.1 Commits:**
 - `feat(accounts): add signup view and template`
@@ -82,8 +82,8 @@ accounts   → imports nothing from project apps
 
 | # | Checkpoint | Branch | Status |
 |---|------------|--------|--------|
-| 2.1 | `Membership` + `MembershipRequest` models | `feature/memberships` | ⬜ |
-| 2.2 | Request membership flow | `feature/memberships` | ⬜ |
+| 2.1 | `Membership` + `MembershipRequest` models | `feature/memberships` | 🔄 |
+| 2.2 | Request membership flow | `feature/memberships` | 🔄 |
 | 2.3 | Admin approve/reject UI | `feature/memberships` | ⬜ |
 | 2.4 | Role helpers + decorators | `feature/memberships` | ⬜ |
 | 2.5 | Member list page | `feature/memberships` | ⬜ |
