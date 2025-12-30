@@ -16,7 +16,6 @@
     --color-green-800: oklch(44.8% 0.119 151.328);
     --color-blue-100: oklch(93.2% 0.032 255.585);
     --color-blue-800: oklch(42.4% 0.199 265.638);
-    --color-gray-50: oklch(98.5% 0.002 247.839);
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-500: oklch(55.1% 0.027 264.364);
     --color-gray-600: oklch(44.6% 0.03 256.802);
@@ -41,11 +40,15 @@
     --radius-lg: 0.5rem;
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
-    --color-primary-500: #1e3a5f;
-    --color-primary-600: #172e4d;
-    --color-primary-700: #0f1f33;
-    --color-silver-200: #e4e4e7;
-    --color-silver-300: #d4d4d8;
+    --color-primary-200: #99adff;
+    --color-primary-500: #0046FF;
+    --color-primary-600: #0039cc;
+    --color-primary-700: #001BB7;
+    --color-accent-500: #FF8040;
+    --color-accent-600: #e66a2a;
+    --color-cream-50: #fdfcf7;
+    --color-cream-100: #F5F1DC;
+    --color-cream-200: #ebe5c4;
   }
 }
 @layer base {
@@ -318,14 +321,14 @@
   .bg-blue-100 {
     background-color: var(--color-blue-100);
   }
-  .bg-gray-50 {
-    background-color: var(--color-gray-50);
+  .bg-cream-50 {
+    background-color: var(--color-cream-50);
   }
   .bg-green-100 {
     background-color: var(--color-green-100);
   }
-  .bg-primary-500 {
-    background-color: var(--color-primary-500);
+  .bg-primary-700 {
+    background-color: var(--color-primary-700);
   }
   .bg-red-100 {
     background-color: var(--color-red-100);
@@ -477,21 +480,29 @@
   }
   .btn:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--color-primary-500, #1e3a5f);
+    box-shadow: 0 0 0 2px var(--color-primary-500, #0046FF);
   }
   .btn-primary {
-    background-color: var(--color-primary-500, #1e3a5f);
+    background-color: var(--color-primary-500, #0046FF);
     color: white;
   }
   .btn-primary:hover {
-    background-color: var(--color-primary-700, #0f1f33);
+    background-color: var(--color-primary-700, #001BB7);
   }
   .btn-secondary {
-    background-color: var(--color-silver-200, #e4e4e7);
-    color: var(--color-primary-700, #0f1f33);
+    background-color: var(--color-cream-100, #F5F1DC);
+    color: var(--color-primary-700, #001BB7);
+    border: 1px solid var(--color-primary-200, #99adff);
   }
   .btn-secondary:hover {
-    background-color: var(--color-silver-300, #d4d4d8);
+    background-color: var(--color-cream-200, #ebe5c4);
+  }
+  .btn-accent {
+    background-color: var(--color-accent-500, #FF8040);
+    color: white;
+  }
+  .btn-accent:hover {
+    background-color: var(--color-accent-600, #e66a2a);
   }
   .btn-danger {
     background-color: #dc2626;
@@ -515,7 +526,7 @@
   }
   .input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--color-primary-500, #1e3a5f);
+    box-shadow: 0 0 0 2px var(--color-primary-500, #0046FF);
     border-color: transparent;
   }
   .card {
