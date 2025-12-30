@@ -176,14 +176,14 @@
                 </div>
             </div>
             {% endif %}
+            <!-- Back Link -->
+         <div class="pb-8 text-center">
+            <a href="{% url 'clubs:club_list' %}" class="text-gray-600 hover:text-gray-900">
+                ⬅️ Back to all clubs
+            </a>
+        </div>
         </div>
     </div>
 
-    <!-- Back Link -->
-    <div class="mt-8 px-6 sm:px-8 pb-8">
-        <a href="{% url 'clubs:club_list' %}" class="text-gray-600 hover:text-gray-900">
-            ⬅️ Back to all clubs
-        </a>
-    </div>
 </div>
 {% endblock %}
