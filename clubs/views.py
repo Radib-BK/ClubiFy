@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
+from django.db.models import Q
 
 from .models import Club
 from .forms import ClubForm
@@ -16,6 +17,29 @@ class ClubListView(ListView):
     template_name = 'clubs/club_list.html'
     context_object_name = 'clubs'
     paginate_by = 12
+
+    def get_queryset(self):
+        """
+        Support partial-name / description search across ALL clubs.
+        Search is applied before pagination so results are global, not page-limited.
+        """
+        qs = super().get_queryset()
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q)
+            )
+        return qs
+
+    def get_context_data(self, **kwargs):
+        """
+        Expose current search term so the input can keep its value
+        and pagination links can preserve the query.
+        """
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '').strip()
+        return context
 
 
 class ClubDetailView(DetailView):

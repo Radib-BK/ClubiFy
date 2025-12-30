@@ -3,16 +3,45 @@
 {% block title %}Browse Clubs - ClubiFy{% endblock %}
 
 {% block content %}
-<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-        <h1 class="text-3xl font-bold text-primary-700">Discover Clubs</h1>
-        <p class="text-gray-600 mt-1">Find communities that match your interests</p>
+<div class="mb-6 space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-primary-700">Discover Clubs</h1>
+            <p class="text-gray-600 mt-1">Find communities that match your interests</p>
+        </div>
+        <!-- Search Form -->
+        <form method="get" class="max-w-md">
+            <label for="club-search" class="sr-only">Search clubs</label>
+            <div class="relative min-w-80">
+                <input
+                    id="club-search"
+                    type="text"
+                    name="q"
+                    value="{{ q }}"
+                    placeholder="Search clubs by name or description..."
+                    class="w-full rounded-lg border border-gray-300 bg-white px-6 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+                <button type="submit" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+                    </svg>
+                </button>
+            </div>
+            {% if q %}
+            <p class="mt-2 text-xs text-gray-500">
+                Showing results for <span class="font-semibold">"{{ q }}"</span>
+                <a href="{% url 'clubs:club_list' %}" class="ml-2 text-primary-600 hover:underline">Clear</a>
+            </p>
+            {% endif %}
+        </form>
+        {% if user.is_authenticated %}
+        <a href="{% url 'clubs:club_create' %}" class="btn btn-primary inline-flex items-center gap-2">
+            <span>+</span> Create Club
+        </a>
+        {% endif %}
     </div>
-    {% if user.is_authenticated %}
-    <a href="{% url 'clubs:club_create' %}" class="btn btn-primary inline-flex items-center gap-2">
-        <span>+</span> Create Club
-    </a>
-    {% endif %}
+
+    
 </div>
 
 {% if clubs %}
@@ -51,7 +80,7 @@
 {% if is_paginated %}
 <div class="mt-8 flex justify-center gap-2">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">← Previous</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-secondary">← Previous</a>
     {% endif %}
     
     <span class="px-4 py-2 text-gray-600">
@@ -59,7 +88,7 @@
     </span>
     
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Next →</a>
+        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-secondary">Next →</a>
     {% endif %}
 </div>
 {% endif %}
