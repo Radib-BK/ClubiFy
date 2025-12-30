@@ -64,32 +64,60 @@
                 <p class="text-gray-700 whitespace-pre-line">{{ club.description }}</p>
             </div>
 
-            <!-- News Section Placeholder -->
+            <!-- News Section -->
             <div class="card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-900">📢 News</h2>
                     {% if is_member and membership.is_moderator %}
-                        <span class="text-xs text-gray-400">+ Add News (Day 3)</span>
+                        <a href="{% url 'posts:create_post' slug=club.slug %}?type=news" 
+                           class="text-xs text-primary-600 hover:underline">+ Add News</a>
                     {% endif %}
                 </div>
-                <div class="text-center py-8 text-gray-500">
-                    <p>No news posts yet.</p>
-                    <p class="text-sm mt-1">News posts will appear here in Day 3.</p>
-                </div>
+                {% if news_posts %}
+                    <div class="space-y-4">
+                        {% for post in news_posts %}
+                        <div class="border-l-4 border-primary-500 pl-4 py-2">
+                            <h3 class="font-medium text-gray-900">{{ post.title }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">{{ post.body|truncatewords:30 }}</p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No news posts yet.</p>
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Blog Section Placeholder -->
+            <!-- Blog Section -->
             <div class="card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-900">📝 Blog Posts</h2>
                     {% if is_member %}
-                        <span class="text-xs text-gray-400">+ Add Blog (Day 3)</span>
+                        <a href="{% url 'posts:create_post' slug=club.slug %}" 
+                           class="text-xs text-primary-600 hover:underline">+ Add Blog</a>
                     {% endif %}
                 </div>
-                <div class="text-center py-8 text-gray-500">
-                    <p>No blog posts yet.</p>
-                    <p class="text-sm mt-1">Blog posts will appear here in Day 3.</p>
-                </div>
+                {% if blog_posts %}
+                    <div class="space-y-4">
+                        {% for post in blog_posts %}
+                        <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                            <h3 class="font-medium text-gray-900">{{ post.title }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">{{ post.body|truncatewords:30 }}</p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No blog posts yet.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
@@ -140,7 +168,9 @@
                     <a href="{% url 'memberships:request_list' slug=club.slug %}" class="block text-sm text-gray-700 hover:text-primary-600">
                         📋 Manage Requests
                     </a>
-                    <span class="block text-sm text-gray-400">📝 Create Post (Day 3)</span>
+                    <a href="{% url 'posts:create_post' slug=club.slug %}" class="block text-sm text-gray-700 hover:text-primary-600">
+                        📝 Create Post
+                    </a>
                 </div>
             </div>
             {% endif %}

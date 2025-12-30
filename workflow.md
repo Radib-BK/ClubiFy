@@ -101,8 +101,8 @@ accounts   → imports nothing from project apps
 
 | # | Checkpoint | Branch | Status |
 |---|------------|--------|--------|
-| 3.1 | `Post` model (BLOG/NEWS) | `feature/posts` | ⬜ |
-| 3.2 | Post creation with role-based permissions | `feature/posts` | ⬜ |
+| 3.1 | `Post` model (BLOG/NEWS) | `feature/posts` | 🔄 |
+| 3.2 | Post creation with role-based permissions | `feature/posts` | 🔄 |
 | 3.3 | Post listing on club detail | `feature/posts` | ⬜ |
 | 3.4 | Dockerfile | `feature/docker` | ⬜ |
 | 3.5 | docker-compose.yml + .env.example | `feature/docker` | ⬜ |

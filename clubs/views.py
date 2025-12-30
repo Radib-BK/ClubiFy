@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from .models import Club
 from .forms import ClubForm
 from memberships.models import Membership, MembershipRequest, RequestStatus
+from posts.models import Post, PostType
 
 
 class ClubListView(ListView):
@@ -49,6 +50,19 @@ class ClubDetailView(DetailView):
                 status=RequestStatus.PENDING
             ).first()
             context['pending_request'] = pending
+
+        # Get posts for this club
+        context['news_posts'] = Post.objects.filter(
+            club=club, 
+            post_type=PostType.NEWS,
+            is_published=True
+        )[:5]
+        
+        context['blog_posts'] = Post.objects.filter(
+            club=club, 
+            post_type=PostType.BLOG,
+            is_published=True
+        )[:5]
 
         return context
 
