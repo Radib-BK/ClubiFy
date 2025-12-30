@@ -16,7 +16,7 @@ class ClubListView(ListView):
     model = Club
     template_name = 'clubs/club_list.html'
     context_object_name = 'clubs'
-    paginate_by = 12
+    paginate_by = 6
 
     def get_queryset(self):
         """
