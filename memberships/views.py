@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponseForbidden
+from django.utils import timezone
 
 from clubs.models import Club
 from .models import Membership, MembershipRequest, RoleChoices, RequestStatus
@@ -85,4 +86,63 @@ def request_list(request, slug):
         'club': club,
         'pending_requests': pending_requests,
     })
+
+
+@login_required
+def approve_request(request, slug, request_id):
+    """Approve a membership request - admin only."""
+    club = get_object_or_404(Club, slug=slug)
+    
+    if not is_club_admin(request.user, club):
+        messages.error(request, 'Only club admins can approve requests.')
+        return redirect('clubs:club_detail', slug=slug)
+    
+    membership_request = get_object_or_404(
+        MembershipRequest, 
+        id=request_id, 
+        club=club, 
+        status=RequestStatus.PENDING
+    )
+    
+    # Update request status
+    membership_request.status = RequestStatus.APPROVED
+    membership_request.reviewed_at = timezone.now()
+    membership_request.reviewed_by = request.user
+    membership_request.save()
+    
+    # Create membership
+    Membership.objects.create(
+        user=membership_request.user,
+        club=club,
+        role=RoleChoices.MEMBER
+    )
+    
+    messages.success(request, f'{membership_request.user.username} has been approved as a member!')
+    return redirect('memberships:request_list', slug=slug)
+
+
+@login_required
+def reject_request(request, slug, request_id):
+    """Reject a membership request - admin only."""
+    club = get_object_or_404(Club, slug=slug)
+    
+    if not is_club_admin(request.user, club):
+        messages.error(request, 'Only club admins can reject requests.')
+        return redirect('clubs:club_detail', slug=slug)
+    
+    membership_request = get_object_or_404(
+        MembershipRequest, 
+        id=request_id, 
+        club=club, 
+        status=RequestStatus.PENDING
+    )
+    
+    # Update request status
+    membership_request.status = RequestStatus.REJECTED
+    membership_request.reviewed_at = timezone.now()
+    membership_request.reviewed_by = request.user
+    membership_request.save()
+    
+    messages.info(request, f'{membership_request.user.username}\'s request has been rejected.')
+    return redirect('memberships:request_list', slug=slug)
 

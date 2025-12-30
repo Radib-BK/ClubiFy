@@ -7,4 +7,6 @@ urlpatterns = [
     path('clubs/<slug:slug>/join/', views.request_membership, name='request_membership'),
     path('clubs/<slug:slug>/members/', views.member_list, name='member_list'),
     path('clubs/<slug:slug>/requests/', views.request_list, name='request_list'),
+    path('clubs/<slug:slug>/requests/<int:request_id>/approve/', views.approve_request, name='approve_request'),
+    path('clubs/<slug:slug>/requests/<int:request_id>/reject/', views.reject_request, name='reject_request'),
 ]

@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 
 from .models import Club
 from .forms import ClubForm
-from memberships.models import Membership, MembershipRequest, RoleChoices, RequestStatus
+from memberships.models import Membership, MembershipRequest, RequestStatus
 
 
 class ClubListView(ListView):
@@ -64,12 +64,8 @@ class ClubCreateView(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         response = super().form_valid(form)
         
-        # Create admin membership for the creator
-        Membership.objects.create(
-            user=self.request.user,
-            club=self.object,
-            role=RoleChoices.ADMIN
-        )
+        # Note: Admin membership is created automatically via signal
+        # See memberships/signals.py
         
         messages.success(
             self.request, 
