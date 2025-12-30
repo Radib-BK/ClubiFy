@@ -1,24 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponseForbidden
 from django.utils import timezone
 
 from clubs.models import Club
 from .models import Membership, MembershipRequest, RoleChoices, RequestStatus
-
-
-def get_user_membership(user, club):
-    """Helper to get user's membership in a club."""
-    if not user.is_authenticated:
-        return None
-    return Membership.objects.filter(user=user, club=club).first()
-
-
-def is_club_admin(user, club):
-    """Check if user is admin of the club."""
-    membership = get_user_membership(user, club)
-    return membership and membership.is_admin
+from .helpers import get_membership, is_club_admin
+from .decorators import club_member_required, club_admin_required
 
 
 @login_required
@@ -49,33 +37,25 @@ def request_membership(request, slug):
     return redirect('clubs:club_detail', slug=slug)
 
 
-@login_required
+@club_member_required
 def member_list(request, slug):
     """Display list of club members - only visible to members."""
     club = get_object_or_404(Club, slug=slug)
-    membership = get_user_membership(request.user, club)
-    
-    if not membership:
-        messages.error(request, 'You must be a member to view the member list.')
-        return redirect('clubs:club_detail', slug=slug)
-    
+    membership = get_membership(request.user, club)
     members = Membership.objects.filter(club=club).select_related('user').order_by('role', '-joined_at')
     
     return render(request, 'memberships/member_list.html', {
         'club': club,
         'members': members,
         'membership': membership,
+        'is_admin': membership and membership.is_admin,
     })
 
 
-@login_required
+@club_admin_required
 def request_list(request, slug):
     """Display pending membership requests - only visible to admin."""
     club = get_object_or_404(Club, slug=slug)
-    
-    if not is_club_admin(request.user, club):
-        messages.error(request, 'Only club admins can view membership requests.')
-        return redirect('clubs:club_detail', slug=slug)
     
     pending_requests = MembershipRequest.objects.filter(
         club=club, 
@@ -88,14 +68,10 @@ def request_list(request, slug):
     })
 
 
-@login_required
+@club_admin_required
 def approve_request(request, slug, request_id):
     """Approve a membership request - admin only."""
     club = get_object_or_404(Club, slug=slug)
-    
-    if not is_club_admin(request.user, club):
-        messages.error(request, 'Only club admins can approve requests.')
-        return redirect('clubs:club_detail', slug=slug)
     
     membership_request = get_object_or_404(
         MembershipRequest, 
@@ -121,14 +97,10 @@ def approve_request(request, slug, request_id):
     return redirect('memberships:request_list', slug=slug)
 
 
-@login_required
+@club_admin_required
 def reject_request(request, slug, request_id):
     """Reject a membership request - admin only."""
     club = get_object_or_404(Club, slug=slug)
-    
-    if not is_club_admin(request.user, club):
-        messages.error(request, 'Only club admins can reject requests.')
-        return redirect('clubs:club_detail', slug=slug)
     
     membership_request = get_object_or_404(
         MembershipRequest, 
@@ -146,3 +118,48 @@ def reject_request(request, slug, request_id):
     messages.info(request, f'{membership_request.user.username}\'s request has been rejected.')
     return redirect('memberships:request_list', slug=slug)
 
+
+@club_admin_required
+def promote_to_moderator(request, slug, membership_id):
+    """Promote a member to moderator - admin only."""
+    club = get_object_or_404(Club, slug=slug)
+    
+    membership = get_object_or_404(Membership, id=membership_id, club=club)
+    
+    # Can't promote yourself or another admin
+    if membership.role == RoleChoices.ADMIN:
+        messages.error(request, 'Cannot change admin role.')
+        return redirect('memberships:member_list', slug=slug)
+    
+    if membership.role == RoleChoices.MODERATOR:
+        messages.info(request, f'{membership.user.username} is already a moderator.')
+        return redirect('memberships:member_list', slug=slug)
+    
+    membership.role = RoleChoices.MODERATOR
+    membership.save()
+    
+    messages.success(request, f'{membership.user.username} has been promoted to Moderator!')
+    return redirect('memberships:member_list', slug=slug)
+
+
+@club_admin_required
+def demote_to_member(request, slug, membership_id):
+    """Demote a moderator back to member - admin only."""
+    club = get_object_or_404(Club, slug=slug)
+    
+    membership = get_object_or_404(Membership, id=membership_id, club=club)
+    
+    # Can't demote an admin
+    if membership.role == RoleChoices.ADMIN:
+        messages.error(request, 'Cannot demote an admin.')
+        return redirect('memberships:member_list', slug=slug)
+    
+    if membership.role == RoleChoices.MEMBER:
+        messages.info(request, f'{membership.user.username} is already a member.')
+        return redirect('memberships:member_list', slug=slug)
+    
+    membership.role = RoleChoices.MEMBER
+    membership.save()
+    
+    messages.success(request, f'{membership.user.username} has been demoted to Member.')
+    return redirect('memberships:member_list', slug=slug)

@@ -84,8 +84,8 @@ accounts   → imports nothing from project apps
 |---|------------|--------|--------|
 | 2.1 | `Membership` + `MembershipRequest` models | `feature/memberships` | ✅ |
 | 2.2 | Request membership flow | `feature/memberships` | ✅ |
-| 2.3 | Admin approve/reject UI | `feature/memberships` | 🔄 |
-| 2.4 | Role helpers + decorators | `feature/memberships` | ⬜ |
+| 2.3 | Admin approve/reject UI | `feature/memberships` | ✅ |
+| 2.4 | Role helpers + decorators | `feature/memberships` | 🔄 |
 | 2.5 | Member list page | `feature/memberships` | ⬜ |
 
 **Commits:**

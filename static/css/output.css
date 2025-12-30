@@ -63,6 +63,7 @@
     --color-primary-500: #0046FF;
     --color-primary-600: #0039cc;
     --color-primary-700: #001BB7;
+    --color-primary-800: #001590;
     --color-accent-500: #FF8040;
     --color-accent-600: #e66a2a;
     --color-cream-50: #fdfcf7;
@@ -398,6 +399,13 @@
   }
   .gap-8 {
     gap: calc(var(--spacing) * 8);
+  }
+  .space-y-1 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 1) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
+    }
   }
   .space-y-2 {
     :where(& > :not(:last-child)) {
@@ -738,6 +746,13 @@
       }
     }
   }
+  .hover\:text-gray-700 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-gray-700);
+      }
+    }
+  }
   .hover\:text-gray-900 {
     &:hover {
       @media (hover: hover) {
@@ -756,6 +771,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-primary-700);
+      }
+    }
+  }
+  .hover\:text-primary-800 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-primary-800);
       }
     }
   }
