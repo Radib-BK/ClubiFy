@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 
 from .forms import SignUpForm, LoginForm
+from memberships.models import Membership, MembershipRequest, RequestStatus
 
 
 class SignUpView(CreateView):
@@ -42,3 +44,29 @@ class CustomLogoutView(LogoutView):
         if request.user.is_authenticated:
             messages.info(request, 'You have been logged out.')
         return super().dispatch(request, *args, **kwargs)
+
+
+@login_required
+def profile(request):
+    """User profile page showing memberships and pending requests."""
+    user = request.user
+    
+    # Get user's memberships
+    memberships = Membership.objects.filter(user=user).select_related('club').order_by('-joined_at')
+    
+    # Get pending requests
+    pending_requests = MembershipRequest.objects.filter(
+        user=user,
+        status=RequestStatus.PENDING
+    ).select_related('club').order_by('-requested_at')
+    
+    # Count stats
+    admin_count = memberships.filter(role='admin').count()
+    post_count = user.posts.count()
+    
+    return render(request, 'accounts/profile.html', {
+        'memberships': memberships,
+        'pending_requests': pending_requests,
+        'admin_count': admin_count,
+        'post_count': post_count,
+    })
