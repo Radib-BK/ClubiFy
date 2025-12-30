@@ -76,13 +76,14 @@
                 {% if news_posts %}
                     <div class="space-y-4">
                         {% for post in news_posts %}
-                        <div class="border-l-4 border-primary-500 pl-4 py-2">
-                            <h3 class="font-medium text-gray-900">{{ post.title }}</h3>
+                        <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" 
+                           class="block border-l-4 border-primary-500 pl-4 py-2 hover:bg-gray-50 transition-colors">
+                            <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ post.body|truncatewords:30 }}</p>
                             <p class="text-xs text-gray-400 mt-2">
-                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }}
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="text-primary-600">Read more →</span>
                             </p>
-                        </div>
+                        </a>
                         {% endfor %}
                     </div>
                 {% else %}
@@ -104,13 +105,14 @@
                 {% if blog_posts %}
                     <div class="space-y-4">
                         {% for post in blog_posts %}
-                        <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                            <h3 class="font-medium text-gray-900">{{ post.title }}</h3>
+                        <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" 
+                           class="block border-b border-gray-100 pb-4 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors -mx-2 px-2 rounded">
+                            <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ post.body|truncatewords:30 }}</p>
                             <p class="text-xs text-gray-400 mt-2">
-                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }}
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="text-primary-600">Read more →</span>
                             </p>
-                        </div>
+                        </a>
                         {% endfor %}
                     </div>
                 {% else %}

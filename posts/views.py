@@ -8,6 +8,17 @@ from .models import Post, PostType
 from .forms import BlogPostForm, NewsPostForm
 
 
+def post_detail(request, slug, post_id):
+    """Display a single post - accessible to everyone."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    
+    return render(request, 'posts/post_detail.html', {
+        'club': club,
+        'post': post,
+    })
+
+
 @club_member_required
 def create_post(request, slug):
     """Create a new post - members can create blogs, moderators/admins can create news."""
