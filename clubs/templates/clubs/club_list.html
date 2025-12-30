@@ -3,18 +3,80 @@
 {% block title %}Browse Clubs - ClubiFy{% endblock %}
 
 {% block content %}
-<div class="text-center py-12">
-    <h1 class="text-3xl font-bold text-gray-900 mb-4">Welcome to ClubiFy</h1>
-    <p class="text-gray-600 mb-8">Discover and join amazing clubs. This page will show clubs soon!</p>
-    
-    {% if not user.is_authenticated %}
-    <div class="space-x-4">
-        <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Get Started</a>
-        <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Login</a>
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-primary-700">Discover Clubs</h1>
+        <p class="text-gray-600 mt-1">Find communities that match your interests</p>
     </div>
-    {% else %}
-    <p class="text-gray-600">Club list coming in checkpoint 1.4!</p>
+    {% if user.is_authenticated %}
+    <a href="{% url 'clubs:club_create' %}" class="btn btn-primary inline-flex items-center gap-2">
+        <span>+</span> Create Club
+    </a>
     {% endif %}
 </div>
-{% endblock %}
 
+{% if clubs %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for club in clubs %}
+    <a href="{{ club.get_absolute_url }}" class="card hover:shadow-lg transition-shadow duration-200 group">
+        <!-- Color Banner -->
+        <div class="h-32 relative" style="background-color: {{ club.color }};">
+            <div class="absolute bottom-4 left-4">
+                <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center">
+                    <span class="text-2xl font-bold text-primary-700">
+                        {{ club.name|slice:":1"|upper }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-5">
+            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                {{ club.name }}
+            </h3>
+            <p class="text-gray-600 text-sm mt-2 line-clamp-2">
+                {{ club.description|truncatewords:20 }}
+            </p>
+            <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                <span>Created {{ club.created_at|date:"M j, Y" }}</span>
+                <span class="text-primary-600 font-medium group-hover:underline"> View </span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="mt-8 flex justify-center gap-2">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">← Previous</a>
+    {% endif %}
+    
+    <span class="px-4 py-2 text-gray-600">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<!-- Empty State -->
+<div class="text-center py-16">
+    <div class="w-24 h-24 mx-auto bg-cream-100 rounded-full flex items-center justify-center mb-6">
+        <span class="text-4xl">🏠</span>
+    </div>
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">No clubs yet</h2>
+    <p class="text-gray-600 mb-6">Be the first to create a community!</p>
+    {% if user.is_authenticated %}
+        <a href="{% url 'clubs:club_create' %}" class="btn btn-primary">Create the First Club</a>
+    {% else %}
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Sign Up to Create a Club</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
