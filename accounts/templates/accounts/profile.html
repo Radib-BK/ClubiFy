@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
+                <span class="text-2xl font-bold text-primary-700">
+                    {{ user.username|slice:":1"|upper }}
+                </span>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ user.username }}</h1>
+                <p class="text-gray-600">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="m-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="card p-4 text-center">
+            <p class="text-2xl font-bold text-primary-600">{{ memberships.count }}</p>
+            <p class="text-sm text-gray-500">Club{{ memberships.count|pluralize }}</p>
+        </div>
+        <div class="card p-4 text-center">
+            <p class="text-2xl font-bold text-yellow-600">{{ pending_requests.count }}</p>
+            <p class="text-sm text-gray-500">Pending</p>
+        </div>
+        <div class="card p-4 text-center">
+            <p class="text-2xl font-bold text-purple-600">{{ admin_count }}</p>
+            <p class="text-sm text-gray-500">Admin Of</p>
+        </div>
+        <div class="card p-4 text-center">
+            <p class="text-2xl font-bold text-gray-600">{{ post_count }}</p>
+            <p class="text-sm text-gray-500">Post{{ post_count|pluralize }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- My Clubs -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">My Clubs</h2>
+            
+            {% if memberships %}
+            <div class="space-y-3">
+                {% for membership in memberships %}
+                <a href="{{ membership.club.get_absolute_url }}" 
+                   class="card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
+                         style="background-color: {{ membership.club.color }};">
+                        <span class="text-lg font-bold text-white drop-shadow">
+                            {{ membership.club.name|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium text-gray-900">{{ membership.club.name }}</h3>
+                        <p class="text-sm text-gray-500">Joined {{ membership.joined_at|date:"M j, Y" }}</p>
+                    </div>
+                    <span class="px-3 py-1 text-xs font-medium rounded-full 
+                        {% if membership.role == 'admin' %}bg-primary-100 text-primary-700
+                        {% elif membership.role == 'moderator' %}bg-purple-100 text-purple-700
+                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {{ membership.get_role_display }}
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card p-8 text-center text-gray-500">
+                <p class="text-lg mb-2">You haven't joined any clubs yet</p>
+                <a href="{% url 'clubs:club_list' %}" class="btn btn-primary mt-4">
+                    Browse Clubs
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pending Requests -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Pending Requests</h2>
+            
+            {% if pending_requests %}
+            <div class="space-y-3">
+                {% for req in pending_requests %}
+                <div class="card p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
+                         style="background-color: {{ req.club.color }};">
+                        <span class="text-lg font-bold text-white drop-shadow">
+                            {{ req.club.name|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium text-gray-900">{{ req.club.name }}</h3>
+                        <p class="text-sm text-gray-500">Requested {{ req.requested_at|timesince }} ago</p>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                        ⏳ Pending
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card p-8 text-center text-gray-500">
+                <p>No pending requests</p>
+                <p class="text-sm mt-1">Your membership requests will appear here</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
