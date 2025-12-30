@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - {{ club.name }} - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900 text-sm">
+            ⬅️ Back to {{ club.name }}
+        </a>
+    </div>
+
+    <!-- Post Card -->
+    <article class="card p-8">
+        <!-- Post Type Badge -->
+        <div class="mb-4">
+            {% if post.is_news %}
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
+                    📢 News
+                </span>
+            {% else %}
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                    📝 Blog
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+
+        <!-- Meta -->
+        <div class="flex items-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span class="text-primary-700 font-medium text-sm">
+                        {{ post.author.username|slice:":1"|upper }}
+                    </span>
+                </div>
+                <span>{{ post.author.username }}</span>
+            </div>
+            <span>·</span>
+            <span>{{ post.created_at|date:"F j, Y" }}</span>
+            <span>·</span>
+            <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-primary-600 hover:underline">
+                {{ club.name }}
+            </a>
+        </div>
+
+        <!-- Content -->
+        <div class="prose prose-lg max-w-none text-gray-700 whitespace-pre-line">
+            {{ post.body }}
+        </div>
+    </article>
+
+    <!-- Navigation -->
+    <div class="mt-8 flex justify-between">
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900">
+            ⬅️ Back to {{ club.name }}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

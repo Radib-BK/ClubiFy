@@ -9,4 +9,5 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/clubs/', permanent=False), name='home'),
     path('clubs/', include('clubs.urls')),
     path('', include('memberships.urls')),
+    path('', include('posts.urls')),
 ]
