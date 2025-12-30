@@ -1,11 +1,10 @@
 from django.urls import path
-from django.views.generic import TemplateView
+from . import views
 
 app_name = 'clubs'
 
-# Placeholder views - will be replaced in checkpoints 1.2-1.5
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='clubs/club_list.html'), name='club_list'),
-    path('new/', TemplateView.as_view(template_name='clubs/club_create.html'), name='club_create'),
+    path('', views.ClubListView.as_view(), name='club_list'),
+    path('new/', views.ClubCreateView.as_view(), name='club_create'),
+    path('<slug:slug>/', views.ClubDetailView.as_view(), name='club_detail'),
 ]
-
