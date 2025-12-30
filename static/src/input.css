@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* Tell Tailwind where to find classes */
+@source "../../templates/**/*.html";
+@source "../../accounts/templates/**/*.html";
+@source "../../clubs/templates/**/*.html";
+@source "../../memberships/templates/**/*.html";
+@source "../../posts/templates/**/*.html";
+
+/* Custom component classes using CSS variables approach for v4 */
+@layer components {
+  .btn {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: colors 0.2s;
+  }
+  
+  .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary-500, #1e3a5f);
+  }
+  
+  .btn-primary {
+    background-color: var(--color-primary-500, #1e3a5f);
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-primary-700, #0f1f33);
+  }
+  
+  .btn-secondary {
+    background-color: var(--color-silver-200, #e4e4e7);
+    color: var(--color-primary-700, #0f1f33);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--color-silver-300, #d4d4d8);
+  }
+  
+  .btn-danger {
+    background-color: #dc2626;
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background-color: #b91c1c;
+  }
+  
+  .btn-success {
+    background-color: #16a34a;
+    color: white;
+  }
+  
+  .btn-success:hover {
+    background-color: #15803d;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+  }
+  
+  .input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary-500, #1e3a5f);
+    border-color: transparent;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Define primary colors as CSS custom properties */
+@theme {
+  /* Navy Blue, Silver, White Theme */
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #1e3a5f;
+  --color-primary-600: #172e4d;
+  --color-primary-700: #0f1f33;
+  --color-primary-800: #0a1628;
+  --color-primary-900: #050b14;
+  
+  /* Silver accent */
+  --color-silver-100: #f4f4f5;
+  --color-silver-200: #e4e4e7;
+  --color-silver-300: #d4d4d8;
+  --color-silver-400: #a1a1aa;
+  --color-silver-500: #71717a;
+}
