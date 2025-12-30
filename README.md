@@ -18,7 +18,11 @@ A Django-based club management platform where users can create clubs, manage mem
 
 ![Club Detail](screenshots/club-detail.png)
 
+![Membership Requests](screenshots/member-req.png)
+
 ![User Profile](screenshots/profile.png)
+
+
 
 ---
 
