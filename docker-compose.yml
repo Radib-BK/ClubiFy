@@ -1,0 +1,63 @@
+version: '3.8'
+
+# =====================================================
+# ClubiFy Docker Setup
+# =====================================================
+# 
+# FOR NEW USERS (fresh clone, no local PostgreSQL):
+#   docker-compose up -d
+#   
+# This starts PostgreSQL + Django. Access at http://localhost:8000
+#
+# =====================================================
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: clubify_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-clubify_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-9084}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Exposed on 5433 to avoid conflict with local PostgreSQL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-clubify_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clubify_web
+    restart: unless-stopped
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-this-in-production-xyz123}
+      - DB_NAME=${DB_NAME:-clubify_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-9084}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - static_volume:/app/staticfiles
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 --threads 2 clubify.wsgi:application"
+
+volumes:
+  postgres_data:
+  static_volume:
