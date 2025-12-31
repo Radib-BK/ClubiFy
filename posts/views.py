@@ -24,6 +24,12 @@ def create_post(request, slug):
     """Create a new post - members can create blogs, moderators/admins can create news."""
     club = get_object_or_404(Club, slug=slug)
     membership = get_membership(request.user, club)
+    
+    if not membership:
+        messages.error(request, 'You must be a member of this club to create posts.')
+        return redirect('clubs:club_detail', slug=slug)
+    
+    # Check permissions (re-check on every request to handle role changes)
     can_create_news = is_club_moderator(request.user, club)
     
     # Choose form based on role
@@ -37,15 +43,53 @@ def create_post(request, slug):
             initial['post_type'] = PostType.NEWS
     
     if request.method == 'POST':
-        form = FormClass(request.POST)
+        # CRITICAL: Re-check permissions at submission time (handles role changes during form fill)
+        can_create_news_now = is_club_moderator(request.user, club)
+        
+        # Check raw POST data for post_type (even if form class changed)
+        raw_post_type = request.POST.get('post_type', '').strip()
+        
+        # Security check: If user selected NEWS but is no longer moderator, reject immediately
+        if raw_post_type == PostType.NEWS and not can_create_news_now:
+            messages.error(
+                request, 
+                'You do not have permission to create News posts. Only moderators and admins can create News posts.'
+            )
+            # Re-render with appropriate form class based on current role
+            FormClassNow = NewsPostForm if can_create_news_now else BlogPostForm
+            form = FormClassNow(request.POST)
+            return render(request, 'posts/post_create.html', {
+                'form': form,
+                'club': club,
+                'membership': membership,
+                'can_create_news': can_create_news_now,
+            })
+        
+        # Use correct form class based on current permissions
+        FormClassNow = NewsPostForm if can_create_news_now else BlogPostForm
+        form = FormClassNow(request.POST)
         
         if form.is_valid():
             post = form.save(commit=False)
             post.club = club
             post.author = request.user
             
-            # For members, always set to BLOG
-            if not can_create_news:
+            # Final security check: Ensure members can't create NEWS
+            if post.post_type == PostType.NEWS and not can_create_news_now:
+                messages.error(
+                    request, 
+                    'You do not have permission to create News posts. Only moderators and admins can create News posts.'
+                )
+                form = FormClassNow(request.POST)
+                return render(request, 'posts/post_create.html', {
+                    'form': form,
+                    'club': club,
+                    'membership': membership,
+                    'can_create_news': can_create_news_now,
+                })
+            
+            # For members, always set to BLOG (safety check)
+            if not can_create_news_now:
                 post.post_type = PostType.BLOG
             
             post.save()
