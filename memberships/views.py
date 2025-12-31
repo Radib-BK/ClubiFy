@@ -20,17 +20,18 @@ def request_membership(request, slug):
         messages.info(request, f'You are already a member of {club.name}.')
         return redirect('clubs:club_detail', slug=slug)
 
-    # Check if request already exists
-    existing_request = MembershipRequest.objects.filter(user=user, club=club).first()
+    # Check if there's already a PENDING request (only block pending, not rejected)
+    pending_request = MembershipRequest.objects.filter(
+        user=user, 
+        club=club, 
+        status=RequestStatus.PENDING
+    ).first()
     
-    if existing_request:
-        if existing_request.status == RequestStatus.PENDING:
-            messages.info(request, f'Your request to join {club.name} is already pending.')
-        elif existing_request.status == RequestStatus.REJECTED:
-            messages.warning(request, f'Your previous request to join {club.name} was rejected.')
+    if pending_request:
+        messages.info(request, f'Your request to join {club.name} is already pending.')
         return redirect('clubs:club_detail', slug=slug)
 
-    # Create new membership request
+    # Create new membership request (allows re-requesting after rejection)
     MembershipRequest.objects.create(user=user, club=club)
     messages.success(request, f'Your request to join {club.name} has been submitted!')
     

@@ -82,7 +82,8 @@ class MembershipRequest(models.Model):
     )
 
     class Meta:
-        unique_together = ['user', 'club']
+        # Allow multiple requests over time (user can re-request after rejection)
+        # Note: unique_together removed to allow re-requests after rejection
         ordering = ['-requested_at']
 
     def __str__(self):
