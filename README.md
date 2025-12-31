@@ -140,6 +140,7 @@ docker-compose up -d --build
 This starts:
 - PostgreSQL database on port 5433
 - Django application on port 8000
+- Migrations run automatically on container startup
 
 #### 4. Create superuser (admin account)
 
@@ -160,6 +161,9 @@ docker-compose up -d
 
 # Start with rebuild (after code changes)
 docker-compose up -d --build
+
+# Run migrations manually (if needed)
+docker-compose exec web python manage.py migrate
 
 # View logs
 docker-compose logs -f web
