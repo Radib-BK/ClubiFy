@@ -75,18 +75,18 @@ class ClubDetailView(DetailView):
             ).first()
             context['pending_request'] = pending
 
-        # Get posts for this club
+        # Get posts for this club (ordered by newest first)
         context['news_posts'] = Post.objects.filter(
             club=club, 
             post_type=PostType.NEWS,
             is_published=True
-        )[:5]
+        ).order_by('-created_at')
         
         context['blog_posts'] = Post.objects.filter(
             club=club, 
             post_type=PostType.BLOG,
             is_published=True
-        )[:5]
+        ).order_by('-created_at')
 
         return context
 
