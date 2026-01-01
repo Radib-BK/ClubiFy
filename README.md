@@ -12,6 +12,17 @@ A Django-based club management platform where users can create clubs, manage mem
 - User profile with club memberships and pending requests
 - Responsive design with Tailwind CSS
 
+## Tech Stack
+
+- Django 4.1.2
+- PostgreSQL
+- Tailwind CSS
+- Gunicorn (production)
+- WhiteNoise (static files)
+- Docker
+
+---
+
 ## Screenshots
 
 ![Club List](screenshots/club-list.png)
@@ -208,16 +219,6 @@ clubify/
 
 ---
 
-## Tech Stack
-
-- Django 4.1.2
-- PostgreSQL
-- Tailwind CSS
-- Gunicorn (production)
-- WhiteNoise (static files)
-- Docker
-
----
 
 ## License
 
