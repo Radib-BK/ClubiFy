@@ -7,7 +7,25 @@
     "tailwind:watch": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch",
     "tailwind:build": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --minify"
   },
-  "keywords": ["django", "tailwindcss"],
-  "license": "MIT"
+  "keywords": [
+    "django",
+    "tailwindcss"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Radib-BK/ClubiFy.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/Radib-BK/ClubiFy/issues"
+  },
+  "homepage": "https://github.com/Radib-BK/ClubiFy#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
+  }
 }
-
