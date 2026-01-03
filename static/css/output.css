@@ -73,6 +73,7 @@
     --color-primary-50: #e6ebff;
     --color-primary-100: #ccd6ff;
     --color-primary-200: #99adff;
+    --color-primary-300: #6685ff;
     --color-primary-500: #0046FF;
     --color-primary-600: #0039cc;
     --color-primary-700: #001BB7;
@@ -958,6 +959,13 @@
   .last\:pb-0 {
     &:last-child {
       padding-bottom: calc(var(--spacing) * 0);
+    }
+  }
+  .hover\:border-primary-300 {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-primary-300);
+      }
     }
   }
   .hover\:border-red-300 {
