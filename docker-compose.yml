@@ -39,16 +39,17 @@ services:
     container_name: clubify_web
     restart: unless-stopped
     environment:
-      - DEBUG=${DEBUG:-False}
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-this-in-production-xyz123}
+      - DEBUG=${DEBUG:-True}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-localtest123}
       - DB_NAME=${DB_NAME:-clubify_db}
       - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-9084}
       - DB_HOST=db
       - DB_PORT=5432
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-"*"}
     ports:
-      - "8000:8000"
+      - "8001:8000"
+      
     depends_on:
       db:
         condition: service_healthy

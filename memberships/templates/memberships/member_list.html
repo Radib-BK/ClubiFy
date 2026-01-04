@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="mb-8">
         <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900 text-sm">
-            ⬅️ Back to {{ club.name }}
+            <i class="fas fa-arrow-left"></i> Back to {{ club.name }}
         </a>
         <h1 class="text-3xl font-bold text-gray-900 mt-4">Members</h1>
         <p class="text-gray-600 mt-1">{{ members.count }} member{{ members.count|pluralize }} in {{ club.name }}</p>
