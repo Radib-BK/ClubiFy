@@ -64,7 +64,7 @@
     <div class="mt-8 px-6 sm:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Left Column: About + Posts -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="lg:col-span-2 space-y-6 mobile-order-2">
             
             <!-- About Section -->
             <div class="card p-6">
@@ -158,7 +158,7 @@
         </div>
 
         <!-- Right Column: Sidebar -->
-        <div class="space-y-6">
+        <div class="space-y-6 mobile-order-1">
             
             <!-- Club Info Card -->
             <div class="card p-6">
@@ -190,7 +190,23 @@
                     {% endif %}
                 </div>
                 {% if is_member %}
-                    <p class="text-sm text-gray-600">{{ member_count }} member{{ member_count|pluralize }} in this club.</p>
+                    {% if display_members %}
+                        <div class="flex items-center gap-2 flex-wrap">
+                            {% for membership in display_members %}
+                                <div class="w-10 h-10 bg-primary-700 rounded-full text-white flex items-center justify-center font-semibold opacity-50 text-sm shadow-sm hover:shadow-md transition-shadow cursor-pointer" title="{{ membership.user.username }}">
+                                    {{ membership.user.username|slice:":1"|upper }}
+                                </div>
+                            {% endfor %}
+                            {% if has_more_members %}
+                                <div class="w-10 h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm shadow-sm cursor-pointer" title="{{ member_count }} total members">
+                                    ...
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p class="text-xs text-gray-500 mt-4">{{ member_count }} member{{ member_count|pluralize }} in this club.</p>
+                    {% else %}
+                        <p class="text-sm text-gray-600">{{ member_count }} member{{ member_count|pluralize }} in this club.</p>
+                    {% endif %}
                 {% else %}
                     <p class="text-sm text-gray-500">Join the club to see members.</p>
                 {% endif %}

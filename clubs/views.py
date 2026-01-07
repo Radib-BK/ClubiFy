@@ -59,6 +59,8 @@ class ClubDetailView(DetailView):
         context['membership'] = None
         context['pending_request'] = None
         context['member_count'] = club.memberships.count()
+        context['display_members'] = []
+        context['has_more_members'] = False
 
         if user.is_authenticated:
             # Check if user is a member
@@ -66,6 +68,9 @@ class ClubDetailView(DetailView):
             if membership:
                 context['is_member'] = True
                 context['membership'] = membership
+                # Show up to 4 members, then "..." if more exist
+                context['display_members'] = club.memberships.select_related('user')[:4]
+                context['has_more_members'] = club.memberships.count() > 4
 
             # Check if user has a pending request
             pending = MembershipRequest.objects.filter(
