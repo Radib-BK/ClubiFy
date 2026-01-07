@@ -113,10 +113,30 @@
     .mobile-order-1 {
       order: revert;
     }
-    .mobile-order-2 {
-      order: revert;
-    }
+  .mobile-order-2 {
+    order: revert;
   }
+}
+
+/* Fix spacing for post content */
+#post-content {
+  margin: 0;
+  padding: 0;
+}
+
+#post-content > *:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+#post-content p:first-child {
+  margin-top: 0;
+}
+
+/* Modal overflow control */
+.modal-open {
+  overflow: hidden;
+}
 }
 
 /* Define primary colors as CSS custom properties */

@@ -40,10 +40,11 @@ RUN groupadd --gid 1000 appgroup && \
 # Set work directory
 WORKDIR /app
 
-# Install runtime dependencies including Node.js for Tailwind
+# Install runtime dependencies including Node.js for Tailwind and git for pytextrank
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
+    git \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
@@ -54,6 +55,9 @@ COPY --from=builder /app/requirements.txt .
 
 # Install dependencies from wheels
 RUN pip install --no-cache /wheels/*
+
+# Download spaCy English models for text summarization (medium model for better quality)
+RUN python -m spacy download en_core_web_md || python -m spacy download en_core_web_sm
 
 # Copy project files
 COPY --chown=appuser:appgroup . .

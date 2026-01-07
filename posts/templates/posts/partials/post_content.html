@@ -1,0 +1,46 @@
+<!-- Post Content (Original or Summarized) -->
+<div id="post-content" class="text-gray-700 text-sm sm:text-base m-0 p-0">
+    {% if is_summarized %}
+        {% if is_fallback %}
+            <div class="bg-yellow-50 border border-yellow-200 rounded-md px-2.5 py-2 mb-3 text-xs">
+                <p class="text-yellow-800 font-medium mb-0.5">
+                    <i class="fas fa-exclamation-triangle text-xs"></i> Summarization Unavailable
+                </p>
+                {% if error %}
+                    <p class="text-yellow-700 text-xs leading-tight break-words">{{ error }}</p>
+                {% else %}
+                    <p class="text-yellow-700 text-xs leading-tight">Showing preview instead:</p>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="m-0 p-0 leading-relaxed">{{ summary }}</div>
+    {% else %}
+        <div class="m-0 p-0 leading-relaxed">{{ post.body }}</div>
+    {% endif %}
+</div>
+
+<!-- Update button state via out-of-band swap (only the form, not the wrapper) -->
+<form id="summarize-form" hx-swap-oob="true" hx-post="{% url 'posts:summarize_post' slug=club.slug post_id=post.id %}" 
+      hx-target="#post-content-wrapper" 
+      hx-swap="innerHTML"
+      class="inline-block">
+    {% csrf_token %}
+    {% if is_summarized %}
+        <input type="hidden" name="action" value="original" id="summarize-action-input">
+        <button type="submit" 
+                id="summarize-btn"
+                class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-primary-700 bg-primary-50 border border-primary-300 rounded-lg shadow-sm hover:bg-primary-100 hover:border-primary-400 hover:shadow-md transition-all duration-200">
+            <i class="fas fa-file-alt text-xs"></i>
+            <span id="summarize-text">Show Original</span>
+        </button>
+    {% else %}
+        <input type="hidden" name="action" value="summarize" id="summarize-action-input">
+        <button type="submit" 
+                id="summarize-btn"
+                class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-primary-700 bg-primary-50 border border-primary-300 rounded-lg shadow-sm hover:bg-primary-100 hover:border-primary-400 hover:shadow-md transition-all duration-200">
+            <i class="fas fa-compress-alt text-xs"></i>
+            <span id="summarize-text">AI Summarize</span>
+        </button>
+    {% endif %}
+</form>
+

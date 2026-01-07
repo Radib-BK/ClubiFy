@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.views.decorators.http import require_http_methods
 
 from clubs.models import Club
 from memberships.decorators import club_member_required
 from memberships.helpers import get_membership, is_club_moderator
 from .models import Post, PostType
 from .forms import BlogPostForm, NewsPostForm
+from .utils.summarizer import summarize_text
 
 
 def post_detail(request, slug, post_id):
@@ -171,3 +173,66 @@ def delete_post(request, slug, post_id):
     
     messages.success(request, f'Post "{post_title}" has been deleted.')
     return redirect('clubs:club_detail', slug=slug)
+
+
+@require_http_methods(["POST"])
+def summarize_post(request, slug, post_id):
+    """Summarize a post using spaCy and PyTextRank - returns HTML fragment for HTMX."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    
+    action = request.POST.get('action', 'summarize')
+    
+    # If action is 'original', return original content
+    if action == 'original':
+        return render(request, 'posts/partials/post_content.html', {
+            'club': club,
+            'post': post,
+            'is_summarized': False,
+        })
+    
+    # Summarize using spaCy and PyTextRank
+    try:
+        summary = summarize_text(post.body)
+        
+        return render(request, 'posts/partials/post_content.html', {
+            'club': club,
+            'post': post,
+            'summary': summary,
+            'is_summarized': True,
+        })
+            
+    except ImportError:
+        # spaCy or PyTextRank not installed
+        summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
+        return render(request, 'posts/partials/post_content.html', {
+            'club': club,
+            'post': post,
+            'summary': summary,
+            'is_summarized': True,
+            'is_fallback': True,
+            'error': 'Summarization library not available. Please install spaCy and PyTextRank.',
+        })
+    except OSError as e:
+        # spaCy model not downloaded
+        summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
+        model_name = 'en_core_web_md' if 'md' in str(e) else 'en_core_web_sm'
+        return render(request, 'posts/partials/post_content.html', {
+            'club': club,
+            'post': post,
+            'summary': summary,
+            'is_summarized': True,
+            'is_fallback': True,
+            'error': f'Language model not found. Please download: python -m spacy download {model_name}',
+        })
+    except Exception as e:
+        # Other errors - return fallback
+        summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
+        return render(request, 'posts/partials/post_content.html', {
+            'club': club,
+            'post': post,
+            'summary': summary,
+            'is_summarized': True,
+            'is_fallback': True,
+            'error': f'Error during summarization: {str(e)}',
+        })
