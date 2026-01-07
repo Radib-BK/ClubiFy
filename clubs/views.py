@@ -8,6 +8,7 @@ from django.db.models import Q
 from .models import Club
 from .forms import ClubForm
 from memberships.models import Membership, MembershipRequest, RequestStatus
+from memberships.helpers import is_club_moderator
 from posts.models import Post, PostType
 
 
@@ -61,6 +62,7 @@ class ClubDetailView(DetailView):
         context['member_count'] = club.memberships.count()
         context['display_members'] = []
         context['has_more_members'] = False
+        context['can_create_news'] = False
 
         if user.is_authenticated:
             # Check if user is a member
@@ -71,6 +73,8 @@ class ClubDetailView(DetailView):
                 # Show up to 4 members, then "..." if more exist
                 context['display_members'] = club.memberships.select_related('user')[:4]
                 context['has_more_members'] = club.memberships.count() > 4
+                # Check if user can create news (moderator/admin)
+                context['can_create_news'] = is_club_moderator(user, club)
 
             # Check if user has a pending request
             pending = MembershipRequest.objects.filter(

@@ -177,6 +177,14 @@
                         <span>{{ member_count }} member{{ member_count|pluralize }}</span>
                     </li>
                 </ul>
+                {% if is_member and membership.is_admin %}
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <a href="{% url 'memberships:request_list' slug=club.slug %}" class="flex items-center gap-2 text-sm text-gray-700 hover:text-primary-600 transition-colors">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Manage Requests</span>
+                    </a>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Members Section -->
@@ -193,7 +201,7 @@
                     {% if display_members %}
                         <div class="flex items-center gap-2 flex-wrap">
                             {% for membership in display_members %}
-                                <div class="w-10 h-10 bg-primary-700 rounded-full text-white flex items-center justify-center font-semibold opacity-50 text-sm shadow-sm hover:shadow-md transition-shadow cursor-pointer" title="{{ membership.user.username }}">
+                                <div class="w-10 h-10 rounded-full text-white flex items-center justify-center font-semibold text-sm shadow-sm hover:shadow-md transition-shadow cursor-pointer" style="background-color: var(--color-primary-500, #0046FF);" title="{{ membership.user.username }}">
                                     {{ membership.user.username|slice:":1"|upper }}
                                 </div>
                             {% endfor %}
@@ -212,16 +220,25 @@
                 {% endif %}
             </div>
 
-            <!-- Admin Actions -->
-            {% if is_member and membership.is_admin %}
-            <div class="card p-6 border-2 border-primary-200">
-                <h3 class="text-sm font-semibold text-primary-700 uppercase tracking-wide mb-4">Admin Panel</h3>
+            <!-- Create Post Card -->
+            {% if is_member %}
+            <div class="card p-6 border-2 border-primary-200" style="background: linear-gradient(to bottom right, var(--color-primary-50, #e6ebff), var(--color-primary-100, #ccd6ff));">
+                <h3 class="text-sm font-semibold text-primary-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-edit"></i>
+                    <span>Write Your Thoughts</span>
+                </h3>
                 <div class="space-y-2">
-                    <a href="{% url 'memberships:request_list' slug=club.slug %}" class="flex items-center gap-2 text-sm text-gray-700 hover:text-primary-600">
-                        <i class="fas fa-clipboard-list"></i> Manage Requests
-                    </a>
-                    <a href="{% url 'posts:create_post' slug=club.slug %}" class="flex items-center gap-2 text-sm text-gray-700 hover:text-primary-600">
-                        <i class="fas fa-pen"></i> Create Post
+                    {% if can_create_news %}
+                        <a href="{% url 'posts:create_post' slug=club.slug %}?type=news" 
+                           class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-primary-600 border border-primary-300 text-sm font-medium rounded-lg hover:bg-primary-50 transition-colors shadow-sm">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Create a News</span>
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'posts:create_post' slug=club.slug %}" 
+                       class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-primary-600 border border-primary-300 text-sm font-medium rounded-lg hover:bg-primary-50 transition-colors shadow-sm">
+                        <i class="fas fa-blog"></i>
+                        <span>Create a Blog</span>
                     </a>
                 </div>
             </div>
