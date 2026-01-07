@@ -1,4 +1,3 @@
-<!-- Post Content (Original or Summarized) -->
 <div id="post-content" class="text-gray-700 text-sm sm:text-base m-0 p-0">
     {% if is_summarized %}
         {% if is_fallback %}
@@ -19,7 +18,6 @@
     {% endif %}
 </div>
 
-<!-- Update button state via out-of-band swap (only the form, not the wrapper) -->
 <form id="summarize-form" hx-swap-oob="true" hx-post="{% url 'posts:summarize_post' slug=club.slug post_id=post.id %}" 
       hx-target="#post-content-wrapper" 
       hx-swap="innerHTML"

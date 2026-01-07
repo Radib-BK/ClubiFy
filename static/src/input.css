@@ -1,13 +1,10 @@
 @import "tailwindcss";
 
-/* Tell Tailwind where to find classes */
 @source "../../templates/**/*.html";
 @source "../../accounts/templates/**/*.html";
 @source "../../clubs/templates/**/*.html";
 @source "../../memberships/templates/**/*.html";
 @source "../../posts/templates/**/*.html";
-
-/* Custom component classes using CSS variables approach for v4 */
 @layer components {
   .btn {
     padding-left: 1rem;
@@ -99,7 +96,6 @@
   }
 }
 
-/* Mobile ordering for club detail page */
 @layer utilities {
   @media (max-width: 1023px) {
     .mobile-order-1 {
@@ -118,7 +114,6 @@
   }
 }
 
-/* Fix spacing for post content */
 #post-content {
   margin: 0;
   padding: 0;
@@ -133,36 +128,30 @@
   margin-top: 0;
 }
 
-/* Modal overflow control */
 .modal-open {
   overflow: hidden;
 }
 }
 
-/* Define primary colors as CSS custom properties */
 @theme {
-  /* Custom Brand Theme */
-  /* Deep Blue → Bright Blue scale */
   --color-primary-50: #e6ebff;
   --color-primary-100: #ccd6ff;
   --color-primary-200: #99adff;
   --color-primary-300: #6685ff;
   --color-primary-400: #335cff;
-  --color-primary-500: #0046FF;  /* Bright Blue */
+  --color-primary-500: #0046FF;
   --color-primary-600: #0039cc;
-  --color-primary-700: #001BB7;  /* Deep Blue */
+  --color-primary-700: #001BB7;
   --color-primary-800: #001590;
   --color-primary-900: #000f69;
   
-  /* Orange accent */
   --color-accent-300: #ffb899;
   --color-accent-400: #ff9966;
-  --color-accent-500: #FF8040;  /* Orange */
+  --color-accent-500: #FF8040;
   --color-accent-600: #e66a2a;
   --color-accent-700: #cc5214;
   
-  /* Cream background */
   --color-cream-50: #fdfcf7;
-  --color-cream-100: #F5F1DC;   /* Cream */
+  --color-cream-100: #F5F1DC;
   --color-cream-200: #ebe5c4;
 }

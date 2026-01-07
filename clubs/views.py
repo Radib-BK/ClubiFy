@@ -55,7 +55,6 @@ class ClubDetailView(DetailView):
         club = self.object
         user = self.request.user
 
-        # Default values for guests
         context['is_member'] = False
         context['membership'] = None
         context['pending_request'] = None
@@ -65,18 +64,14 @@ class ClubDetailView(DetailView):
         context['can_create_news'] = False
 
         if user.is_authenticated:
-            # Check if user is a member
             membership = Membership.objects.filter(user=user, club=club).first()
             if membership:
                 context['is_member'] = True
                 context['membership'] = membership
-                # Show up to 4 members, then "..." if more exist
                 context['display_members'] = club.memberships.select_related('user')[:4]
                 context['has_more_members'] = club.memberships.count() > 4
-                # Check if user can create news (moderator/admin)
                 context['can_create_news'] = is_club_moderator(user, club)
 
-            # Check if user has a pending request
             pending = MembershipRequest.objects.filter(
                 user=user, 
                 club=club, 
@@ -84,7 +79,6 @@ class ClubDetailView(DetailView):
             ).first()
             context['pending_request'] = pending
 
-        # Get latest posts for this club (ordered by newest first)
         news_qs = Post.objects.filter(
             club=club, 
             post_type=PostType.NEWS,
@@ -96,11 +90,8 @@ class ClubDetailView(DetailView):
             is_published=True
         ).order_by('-created_at')
 
-        # Totals (for "View all" indicators)
         context['news_total'] = news_qs.count()
         context['blog_total'] = blog_qs.count()
-
-        # Only show latest 3 on the detail page
         context['news_posts'] = news_qs[:3]
         context['blog_posts'] = blog_qs[:3]
 
@@ -114,13 +105,8 @@ class ClubCreateView(LoginRequiredMixin, CreateView):
     template_name = 'clubs/club_create.html'
     
     def form_valid(self, form):
-        # Set the creator
         form.instance.created_by = self.request.user
         response = super().form_valid(form)
-        
-        # Note: Admin membership is created automatically via signal
-        # See memberships/signals.py
-        
         messages.success(
             self.request, 
             f'Club "{self.object.name}" created successfully! You are now the admin.'

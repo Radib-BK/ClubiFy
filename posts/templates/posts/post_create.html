@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto">
-    <!-- Header -->
     <div class="mb-8">
         <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
             <i class="fas fa-arrow-left"></i>
@@ -27,7 +26,6 @@
         </p>
     </div>
 
-    <!-- Form -->
     <div class="card p-8">
         <form method="post" class="space-y-6">
             {% csrf_token %}

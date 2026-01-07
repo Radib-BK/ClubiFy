@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6">
-    <!-- Header -->
     <div class="mb-4 sm:mb-6">
         <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-xs sm:text-sm bg-white px-2.5 sm:px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
             <i class="fas fa-arrow-left"></i>
@@ -13,9 +12,7 @@
         </a>
     </div>
 
-    <!-- Post Card -->
     <article class="card p-4 sm:p-6 lg:p-8 relative">
-        <!-- Post Type Badge and Action Buttons - Same Line -->
         <div class="flex items-center justify-between mb-4 sm:mb-6">
             <div>
                 {% if post.is_news %}
@@ -31,9 +28,7 @@
                 {% endif %}
             </div>
             
-            <!-- Action Buttons (Summarize and Delete) -->
             <div class="flex items-center gap-2">
-                <!-- Summarize Button (for both News and Blog posts) -->
                 {% if post.body|length > 200 %}
                 <form id="summarize-form" hx-post="{% url 'posts:summarize_post' slug=club.slug post_id=post.id %}" 
                       hx-target="#post-content-wrapper" 
@@ -50,7 +45,6 @@
                 </form>
                 {% endif %}
                 
-                <!-- Delete Button (Moderators/Admins only) -->
                 {% if can_delete %}
                 <button 
                     type="button"
@@ -63,10 +57,8 @@
             </div>
         </div>
 
-        <!-- Title -->
         <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{{ post.title }}</h1>
 
-        <!-- Meta -->
         <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 pb-3 sm:pb-4 border-b border-gray-100 mb-3 sm:mb-4">
             <div class="flex items-center gap-2">
                 <div class="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -84,17 +76,13 @@
             </a>
         </div>
 
-        <!-- Content Wrapper (for HTMX swapping) -->
         <div id="post-content-wrapper">
-            <!-- Post Content (Original or Summarized) -->
             <div id="post-content" class="text-gray-700 text-sm sm:text-base m-0 p-0">
                 <div class="m-0 p-0">{{ post.body }}</div>
             </div>
         </div>
     </article>
 </div>
-
-<!-- Delete Post Modal -->
 {% if can_delete %}
 <div id="deletePostModal" class="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-lg shadow-2xl max-w-md w-full border border-gray-200">
@@ -132,8 +120,7 @@
 <script>
 function openDeletePostModal(postTitle) {
     document.getElementById('postTitle').textContent = '"' + postTitle + '"';
-    const deleteUrl = '{% url "posts:delete_post" slug=club.slug post_id=post.id %}';
-    document.getElementById('deletePostLink').href = deleteUrl;
+    document.getElementById('deletePostLink').href = '{% url "posts:delete_post" slug=club.slug post_id=post.id %}';
     document.getElementById('deletePostModal').classList.remove('hidden');
     document.getElementById('deletePostModal').classList.add('flex');
     document.body.classList.add('modal-open');
@@ -145,7 +132,6 @@ function closeDeletePostModal() {
     document.body.classList.remove('modal-open');
 }
 
-// Close modal when clicking outside
 document.getElementById('deletePostModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeDeletePostModal();
