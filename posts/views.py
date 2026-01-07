@@ -13,9 +13,15 @@ def post_detail(request, slug, post_id):
     club = get_object_or_404(Club, slug=slug)
     post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
     
+    # Check if user can delete (moderator/admin only)
+    membership = get_membership(request.user, club)
+    can_delete = membership and membership.role in ['admin', 'moderator']
+    
     return render(request, 'posts/post_detail.html', {
         'club': club,
         'post': post,
+        'membership': membership,
+        'can_delete': can_delete,
     })
 
 
@@ -146,3 +152,22 @@ def create_post(request, slug):
         'membership': membership,
         'can_create_news': can_create_news,
     })
+
+
+@club_member_required
+def delete_post(request, slug, post_id):
+    """Delete a post - moderators and admins only."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    membership = get_membership(request.user, club)
+    
+    # Check if user is moderator or admin
+    if not membership or membership.role not in ['admin', 'moderator']:
+        messages.error(request, 'You do not have permission to delete posts. Only moderators and admins can delete posts.')
+        return redirect('posts:post_detail', slug=slug, post_id=post_id)
+    
+    post_title = post.title
+    post.delete()
+    
+    messages.success(request, f'Post "{post_title}" has been deleted.')
+    return redirect('clubs:club_detail', slug=slug)

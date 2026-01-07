@@ -11,4 +11,5 @@ urlpatterns = [
     path('clubs/<slug:slug>/requests/<int:request_id>/reject/', views.reject_request, name='reject_request'),
     path('clubs/<slug:slug>/members/<int:membership_id>/promote/', views.promote_to_moderator, name='promote_to_moderator'),
     path('clubs/<slug:slug>/members/<int:membership_id>/demote/', views.demote_to_member, name='demote_to_member'),
+    path('clubs/<slug:slug>/members/<int:membership_id>/remove/', views.remove_member, name='remove_member'),
 ]

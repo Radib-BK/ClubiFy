@@ -3,86 +3,173 @@
 {% block title %}Members - {{ club.name }} - ClubiFy{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
+<div class="max-w-3xl mx-auto px-4 sm:px-6">
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-6 sm:mb-8">
         <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
             <i class="fas fa-arrow-left"></i>
-            <span>Back to {{ club.name }}</span>
+            <span class="hidden sm:inline">Back to {{ club.name }}</span>
+            <span class="sm:hidden">Back</span>
         </a>
-        <h1 class="text-3xl font-bold text-gray-900 mt-4">Members</h1>
-        <p class="text-gray-600 mt-1">{{ members.count }} member{{ members.count|pluralize }} in {{ club.name }}</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-4">Members</h1>
+        <p class="text-sm sm:text-base text-gray-600 mt-1">{{ members.count }} member{{ members.count|pluralize }} in {{ club.name }}</p>
     </div>
 
     <!-- Role Legend (for admins) -->
     {% if is_admin %}
-    <div class="mb-4 p-4 bg-cream-100 rounded-lg text-sm">
-        <p class="font-medium text-gray-700 mb-2">Role Permissions:</p>
-        <ul class="text-gray-600 space-y-1">
-            <li><span class="font-medium">Admin:</span> Approve requests | Manage roles | Create Blog and News</li>
-            <li><span class="font-medium">Moderator:</span> Create Blog and News </li>
-            <li><span class="font-medium">Member:</span> Create Blog </li>
-        </ul>
+    <div class="mb-6 p-3 sm:p-4 bg-slate-50 border border-blue-100 rounded-lg">
+        <p class="text-xs sm:text-sm font-semibold text-gray-700 mb-3">Role Permissions</p>
+        <div class="space-y-2 text-xs sm:text-sm">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-primary-100 text-primary-700 w-20 flex-shrink-0">Admin</span>
+                <span class="text-gray-600">Approve requests, manage roles, create posts</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700 w-20 flex-shrink-0">Moderator</span>
+                <span class="text-gray-600">Create Blog and News posts</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700 w-20 flex-shrink-0">Member</span>
+                <span class="text-gray-600">Create Blog posts</span>
+            </div>
+        </div>
     </div>
     {% endif %}
 
     <!-- Members List -->
     <div class="card divide-y divide-gray-100">
         {% for member in members %}
-        <div class="p-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center
-                    {% if member.role == 'admin' %}bg-primary-100
-                    {% elif member.role == 'moderator' %}bg-purple-100
-                    {% else %}bg-gray-100{% endif %}">
-                    <span class="font-medium
-                        {% if member.role == 'admin' %}text-primary-700
-                        {% elif member.role == 'moderator' %}text-purple-700
-                        {% else %}text-gray-700{% endif %}">
-                        {{ member.user.username|slice:":1"|upper }}
-                    </span>
+        <div class="p-4 sm:p-5 hover:bg-gray-50 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0
+                        {% if member.role == 'admin' %}bg-primary-100
+                        {% elif member.role == 'moderator' %}bg-purple-100
+                        {% else %}bg-gray-100{% endif %}">
+                        <span class="text-xs sm:text-sm font-semibold
+                            {% if member.role == 'admin' %}text-primary-700
+                            {% elif member.role == 'moderator' %}text-purple-700
+                            {% else %}text-gray-700{% endif %}">
+                            {{ member.user.username|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5 sm:mb-1">
+                            <p class="text-sm sm:text-base font-semibold text-gray-900 truncate">
+                                {{ member.user.username }}
+                            </p>
+                            {% if member.user == request.user %}
+                                <span class="text-xs text-gray-500 font-normal flex-shrink-0">(you)</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-500">Joined {{ member.joined_at|date:"M j, Y" }}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-medium text-gray-900">
-                        {{ member.user.username }}
-                        {% if member.user == request.user %}
-                            <span class="text-xs text-gray-500">(you)</span>
-                        {% endif %}
-                    </p>
-                    <p class="text-sm text-gray-500">Joined {{ member.joined_at|date:"M j, Y" }}</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <!-- Role Badge -->
-                <span class="px-3 py-1 text-xs font-medium rounded-full 
-                    {% if member.role == 'admin' %}bg-primary-100 text-primary-700
-                    {% elif member.role == 'moderator' %}bg-purple-100 text-purple-700
-                    {% else %}bg-gray-100 text-gray-700{% endif %}">
-                    {{ member.get_role_display }}
-                </span>
                 
-                <!-- Admin Actions -->
-                {% if is_admin and member.role != 'admin' and member.user != request.user %}
-                    {% if member.role == 'member' %}
-                        <a href="{% url 'memberships:promote_to_moderator' slug=club.slug membership_id=member.id %}" 
-                           class="text-xs text-primary-600 hover:text-primary-800 hover:underline">
-                            ↑ Promote
-                        </a>
-                    {% elif member.role == 'moderator' %}
-                        <a href="{% url 'memberships:demote_to_member' slug=club.slug membership_id=member.id %}" 
-                           class="text-xs text-gray-500 hover:text-gray-700 hover:underline">
-                            ↓ Demote
-                        </a>
+                <div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 flex-shrink-0">
+                    <!-- Role Badge -->
+                    <span class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-md 
+                        {% if member.role == 'admin' %}bg-primary-100 text-primary-700
+                        {% elif member.role == 'moderator' %}bg-purple-100 text-purple-700
+                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {{ member.get_role_display }}
+                    </span>
+                    
+                    <!-- Admin Actions -->
+                    {% if is_admin and member.role != 'admin' and member.user != request.user %}
+                        <div class="flex items-center gap-2">
+                            {% if member.role == 'member' %}
+                                <a href="{% url 'memberships:promote_to_moderator' slug=club.slug membership_id=member.id %}" 
+                                   class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-colors">
+                                    <i class="fas fa-arrow-up text-[10px]"></i>
+                                    <span>Promote</span>
+                                </a>
+                            {% elif member.role == 'moderator' %}
+                                <a href="{% url 'memberships:demote_to_member' slug=club.slug membership_id=member.id %}" 
+                                   class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 hover:border-gray-300 transition-colors">
+                                    <i class="fas fa-arrow-down text-[10px]"></i>
+                                    <span>Demote</span>
+                                </a>
+                            {% endif %}
+                            <button 
+                                type="button"
+                                class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-red-200 bg-white text-red-400 hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+                                onclick="openDeleteModal('{{ member.user.username }}', '{{ member.id }}')"
+                                title="Remove member">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
                     {% endif %}
-                {% endif %}
+                </div>
             </div>
         </div>
         {% empty %}
-        <div class="p-8 text-center text-gray-500">
-            No members yet.
+        <div class="p-12 text-center text-gray-500">
+            <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-users text-gray-400 text-xl"></i>
+            </div>
+            <p class="font-medium text-gray-700 mb-1">No members yet</p>
+            <p class="text-sm">Members will appear here once they join.</p>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<!-- Delete Member Modal -->
+<div id="deleteMemberModal" class="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-2xl max-w-md w-full border border-gray-200">
+        <div class="p-4 sm:p-6">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-sm sm:text-base"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900">Remove Member</h3>
+                    <p class="text-xs sm:text-sm text-gray-500">This action cannot be undone</p>
+                </div>
+            </div>
+            <p class="text-sm sm:text-base text-gray-700 mb-6">
+                Are you sure you want to remove <span id="memberName" class="font-semibold"></span> from <span class="font-semibold">{{ club.name }}</span>? <br class="hidden sm:block">They will lose access to all club content.
+            </p>
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
+                <button 
+                    type="button"
+                    onclick="closeDeleteModal()"
+                    class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <a 
+                    id="deleteMemberLink"
+                    href="#"
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                    Remove Member
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openDeleteModal(username, membershipId) {
+    document.getElementById('memberName').textContent = username;
+    const deleteUrl = '{% url "memberships:remove_member" slug=club.slug membership_id=0 %}'.replace('0', membershipId);
+    document.getElementById('deleteMemberLink').href = deleteUrl;
+    document.getElementById('deleteMemberModal').classList.remove('hidden');
+    document.getElementById('deleteMemberModal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteMemberModal').classList.add('hidden');
+    document.getElementById('deleteMemberModal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside
+document.getElementById('deleteMemberModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteModal();
+    }
+});
+</script>
 {% endblock %}

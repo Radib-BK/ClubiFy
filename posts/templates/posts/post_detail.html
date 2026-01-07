@@ -3,64 +3,130 @@
 {% block title %}{{ post.title }} - {{ club.name }} - ClubiFy{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
+<div class="max-w-3xl mx-auto px-4 sm:px-6">
     <!-- Header -->
-    <div class="mb-6">
-        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+    <div class="mb-4 sm:mb-6">
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-xs sm:text-sm bg-white px-2.5 sm:px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
             <i class="fas fa-arrow-left"></i>
-            <span>Back to {{ club.name }}</span>
+            <span class="hidden sm:inline">Back to {{ club.name }}</span>
+            <span class="sm:hidden">Back</span>
         </a>
     </div>
 
     <!-- Post Card -->
-    <article class="card p-8">
-        <!-- Post Type Badge -->
-        <div class="mb-4">
-            {% if post.is_news %}
-                <span class="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
-                    📢 News
-                </span>
-            {% else %}
-                <span class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                    📝 Blog
-                </span>
+    <article class="card p-4 sm:p-6 lg:p-8 relative">
+        <!-- Post Type Badge and Delete Button - Same Line -->
+        <div class="flex items-center justify-between mb-4 sm:mb-6">
+            <div>
+                {% if post.is_news %}
+                    <span class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs sm:text-sm font-medium">
+                        📢 News
+                    </span>
+                {% else %}
+                    <span class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs sm:text-sm font-medium">
+                        📝 Blog
+                    </span>
+                {% endif %}
+            </div>
+            
+            <!-- Delete Button (Moderators/Admins only) -->
+            {% if can_delete %}
+            <button 
+                type="button"
+                onclick="openDeletePostModal('{{ post.title|escapejs }}')"
+                class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 hover:border-red-300 transition-colors">
+                <i class="fas fa-trash text-xs"></i>
+                <span class="hidden sm:inline">Delete</span>
+            </button>
             {% endif %}
         </div>
 
         <!-- Title -->
-        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{{ post.title }}</h1>
 
         <!-- Meta -->
-        <div class="flex items-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-100">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-gray-100">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <span class="text-primary-700 font-medium text-sm">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-primary-700 font-medium text-xs sm:text-sm">
                         {{ post.author.username|slice:":1"|upper }}
                     </span>
                 </div>
-                <span>{{ post.author.username }}</span>
+                <span class="truncate max-w-[120px] sm:max-w-none">{{ post.author.username }}</span>
             </div>
-            <span>·</span>
-            <span>{{ post.created_at|date:"F j, Y" }}</span>
-            <span>·</span>
-            <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-primary-600 hover:underline">
+            <span class="hidden sm:inline">·</span>
+            <span class="flex-shrink-0">{{ post.created_at|date:"M j, Y" }}</span>
+            <span class="hidden sm:inline">·</span>
+            <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-primary-600 hover:underline truncate max-w-[150px] sm:max-w-none">
                 {{ club.name }}
             </a>
         </div>
 
         <!-- Content -->
-        <div class="prose prose-lg max-w-none text-gray-700 whitespace-pre-line">
+        <div class="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-700 whitespace-pre-line text-sm sm:text-base">
             {{ post.body }}
         </div>
     </article>
+</div>
 
-    <!-- Navigation -->
-    <div class="mt-8 flex justify-between">
-        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
-            <i class="fas fa-arrow-left"></i>
-            <span>Back to {{ club.name }}</span>
-        </a>
+<!-- Delete Post Modal -->
+{% if can_delete %}
+<div id="deletePostModal" class="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-2xl max-w-md w-full border border-gray-200">
+        <div class="p-4 sm:p-6">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-sm sm:text-base"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900">Delete Post</h3>
+                    <p class="text-xs sm:text-sm text-gray-500">This action cannot be undone</p>
+                </div>
+            </div>
+            <p class="text-sm sm:text-base text-gray-700 mb-6">
+                Are you sure you want to delete the post <span id="postTitle" class="font-semibold"></span>? <br class="hidden sm:block">This post will be permanently removed.
+            </p>
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
+                <button 
+                    type="button"
+                    onclick="closeDeletePostModal()"
+                    class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <a 
+                    id="deletePostLink"
+                    href="#"
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                    Delete Post
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function openDeletePostModal(postTitle) {
+    document.getElementById('postTitle').textContent = '"' + postTitle + '"';
+    const deleteUrl = '{% url "posts:delete_post" slug=club.slug post_id=post.id %}';
+    document.getElementById('deletePostLink').href = deleteUrl;
+    document.getElementById('deletePostModal').classList.remove('hidden');
+    document.getElementById('deletePostModal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDeletePostModal() {
+    document.getElementById('deletePostModal').classList.add('hidden');
+    document.getElementById('deletePostModal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside
+document.getElementById('deletePostModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeletePostModal();
+    }
+});
+</script>
+{% endif %}
 {% endblock %}
 

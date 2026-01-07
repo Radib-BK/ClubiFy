@@ -164,3 +164,27 @@ def demote_to_member(request, slug, membership_id):
     
     messages.success(request, f'{membership.user.username} has been demoted to Member.')
     return redirect('memberships:member_list', slug=slug)
+
+
+@club_admin_required
+def remove_member(request, slug, membership_id):
+    """Remove a member from the club - admin only."""
+    club = get_object_or_404(Club, slug=slug)
+    
+    membership = get_object_or_404(Membership, id=membership_id, club=club)
+    
+    # Can't remove yourself
+    if membership.user == request.user:
+        messages.error(request, 'You cannot remove yourself from the club.')
+        return redirect('memberships:member_list', slug=slug)
+    
+    # Can't remove other admins (must have at least one admin)
+    if membership.role == RoleChoices.ADMIN:
+        messages.error(request, 'Cannot remove an admin. Promote another member to admin first.')
+        return redirect('memberships:member_list', slug=slug)
+    
+    username = membership.user.username
+    membership.delete()
+    
+    messages.success(request, f'{username} has been removed from the club.')
+    return redirect('memberships:member_list', slug=slug)
