@@ -20,6 +20,46 @@ def post_detail(request, slug, post_id):
 
 
 @club_member_required
+def news_list(request, slug):
+    """List all news posts for a club - members only."""
+    club = get_object_or_404(Club, slug=slug)
+    membership = get_membership(request.user, club)
+
+    news_posts = Post.objects.filter(
+        club=club,
+        post_type=PostType.NEWS,
+        is_published=True,
+    ).order_by('-created_at')
+
+    return render(request, 'posts/post_list.html', {
+        'club': club,
+        'posts': news_posts,
+        'list_type': 'news',
+        'membership': membership,
+    })
+
+
+@club_member_required
+def blog_list(request, slug):
+    """List all blog posts for a club - members only."""
+    club = get_object_or_404(Club, slug=slug)
+    membership = get_membership(request.user, club)
+
+    blog_posts = Post.objects.filter(
+        club=club,
+        post_type=PostType.BLOG,
+        is_published=True,
+    ).order_by('-created_at')
+
+    return render(request, 'posts/post_list.html', {
+        'club': club,
+        'posts': blog_posts,
+        'list_type': 'blog',
+        'membership': membership,
+    })
+
+
+@club_member_required
 def create_post(request, slug):
     """Create a new post - members can create blogs, moderators/admins can create news."""
     club = get_object_or_404(Club, slug=slug)

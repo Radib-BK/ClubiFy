@@ -75,18 +75,25 @@ class ClubDetailView(DetailView):
             ).first()
             context['pending_request'] = pending
 
-        # Get posts for this club (ordered by newest first)
-        context['news_posts'] = Post.objects.filter(
+        # Get latest posts for this club (ordered by newest first)
+        news_qs = Post.objects.filter(
             club=club, 
             post_type=PostType.NEWS,
             is_published=True
         ).order_by('-created_at')
-        
-        context['blog_posts'] = Post.objects.filter(
+        blog_qs = Post.objects.filter(
             club=club, 
             post_type=PostType.BLOG,
             is_published=True
         ).order_by('-created_at')
+
+        # Totals (for "View all" indicators)
+        context['news_total'] = news_qs.count()
+        context['blog_total'] = blog_qs.count()
+
+        # Only show latest 3 on the detail page
+        context['news_posts'] = news_qs[:3]
+        context['blog_posts'] = blog_qs[:3]
 
         return context
 

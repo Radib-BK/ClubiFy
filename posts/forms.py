@@ -45,6 +45,6 @@ class NewsPostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['post_type'].choices = [
-            (PostType.BLOG, '📝 Blog'),
-            (PostType.NEWS, '📢 News'),
+            (PostType.BLOG, 'Blog'),
+            (PostType.NEWS, 'News'),
         ]

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if list_type == 'news' %}All News - {{ club.name }} - ClubiFy{% else %}All Blog Posts - {{ club.name }} - ClubiFy{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Back to club -->
+    <div class="mb-6">
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to {{ club.name }}</span>
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">
+                {% if list_type == 'news' %}All News{% else %}All Blog Posts{% endif %}
+            </h1>
+            <p class="text-gray-500 text-sm mt-1">
+                {{ club.name }} · {{ posts|length }} {% if list_type == 'news' %}news update{% else %}blog post{% endif %}{{ posts|length|pluralize }}
+            </p>
+        </div>
+    </div>
+
+    {% if posts %}
+        <div class="space-y-4">
+            {% for post in posts %}
+            <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" 
+               class="block card p-4 hover:shadow-md transition-shadow border border-gray-100">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-semibold text-gray-900 hover:text-primary-600">{{ post.title }}</h2>
+                        <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ post.body|truncatewords:30 }}</p>
+                    </div>
+                    <div class="text-right text-xs text-gray-400 whitespace-nowrap">
+                        <p>{{ post.created_at|date:"M j, Y" }}</p>
+                        <p class="mt-1 text-gray-500">By {{ post.author.username }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card p-8 text-center text-gray-500">
+            {% if list_type == 'news' %}
+                <p>No news posts yet.</p>
+            {% else %}
+                <p>No blog posts yet.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+

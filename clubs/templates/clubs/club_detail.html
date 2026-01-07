@@ -78,9 +78,11 @@
                     <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-bullhorn"></i> News
                     </h2>
-                    {% if is_member and membership.is_moderator %}
-                        <a href="{% url 'posts:create_post' slug=club.slug %}?type=news" 
-                           class="text-xs text-primary-600 hover:underline">+ Add News</a>
+                    {% if is_member %}
+                        <a href="{% url 'posts:news_list' slug=club.slug %}" 
+                           class="text-xs text-primary-600 hover:underline">
+                            View all News ({{ news_total }})
+                        </a>
                     {% endif %}
                 </div>
                 {% if news_posts %}
@@ -96,6 +98,15 @@
                         </a>
                         {% endfor %}
                     </div>
+                    {% if is_member and news_total > 3 %}
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <a href="{% url 'posts:news_list' slug=club.slug %}" 
+                           class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
+                            <span>View more</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                    {% endif %}
                 {% else %}
                     <div class="text-center py-8 text-gray-500">
                         <p>No news posts yet.</p>
@@ -110,8 +121,10 @@
                         <i class="fas fa-blog"></i> Blog Posts
                     </h2>
                     {% if is_member %}
-                        <a href="{% url 'posts:create_post' slug=club.slug %}" 
-                           class="text-xs text-primary-600 hover:underline">+ Add Blog</a>
+                        <a href="{% url 'posts:blog_list' slug=club.slug %}" 
+                           class="text-xs text-primary-600 hover:underline">
+                            View all Blogs ({{ blog_total }})
+                        </a>
                     {% endif %}
                 </div>
                 {% if blog_posts %}
@@ -127,6 +140,15 @@
                         </a>
                         {% endfor %}
                     </div>
+                    {% if is_member and blog_total > 3 %}
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <a href="{% url 'posts:blog_list' slug=club.slug %}" 
+                           class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
+                            <span>View more</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                    {% endif %}
                 {% else %}
                     <div class="text-center py-8 text-gray-500">
                         <p>No blog posts yet.</p>

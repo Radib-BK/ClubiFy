@@ -6,8 +6,9 @@
 <div class="max-w-3xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900 text-sm">
-            <i class="fas fa-arrow-left"></i> Back to {{ club.name }}
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to {{ club.name }}</span>
         </a>
     </div>
 
@@ -55,8 +56,9 @@
 
     <!-- Navigation -->
     <div class="mt-8 flex justify-between">
-        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900">
-            <i class="fas fa-arrow-left"></i> Back to {{ club.name }}
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to {{ club.name }}</span>
         </a>
     </div>
 </div>

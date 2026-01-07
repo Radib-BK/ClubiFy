@@ -6,14 +6,16 @@
 <div class="max-w-2xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-gray-600 hover:text-gray-900 text-sm">
-            <i class="fas fa-arrow-left"></i> Back to {{ club.name }}
+        <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to {{ club.name }}</span>
         </a>
-        <h1 class="text-3xl font-bold text-gray-900 mt-4">
+        <h1 class="text-3xl font-bold text-gray-900 mt-4 flex items-center gap-3">
             {% if can_create_news %}
-                Create a Post
+                <span>Create a Post</span>
             {% else %}
-                Create a Blog Post
+                <i class="fas fa-blog text-primary-600"></i>
+                <span>Create a Blog Post</span>
             {% endif %}
         </h1>
         <p class="text-gray-600 mt-1">
@@ -24,17 +26,6 @@
             {% endif %}
         </p>
     </div>
-
-    <!-- Post Type Info (for moderators/admins only) -->
-    {% if can_create_news %}
-    <div class="mb-6 p-4 bg-cream-100 rounded-lg text-sm">
-        <p class="font-medium text-gray-700 mb-2">Post Types:</p>
-        <ul class="text-gray-600 space-y-1">
-            <li><span class="font-medium">📝 Blog:</span> Regular posts for discussions and sharing</li>
-            <li><span class="font-medium">📢 News:</span> Important announcements, highlighted at the top</li>
-        </ul>
-    </div>
-    {% endif %}
 
     <!-- Form -->
     <div class="card p-8">
