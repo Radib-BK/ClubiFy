@@ -40,9 +40,12 @@ RUN groupadd --gid 1000 appgroup && \
 # Set work directory
 WORKDIR /app
 
-# Install runtime dependencies only
+# Install runtime dependencies including Node.js for Tailwind
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy wheels from builder stage
@@ -54,6 +57,13 @@ RUN pip install --no-cache /wheels/*
 
 # Copy project files
 COPY --chown=appuser:appgroup . .
+
+# Install Node.js dependencies for Tailwind
+RUN npm install
+
+# Copy and set up entrypoint script
+COPY --chown=appuser:appgroup docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Collect static files
 RUN python manage.py collectstatic --noinput --clear 2>/dev/null || true
@@ -68,6 +78,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/clubs/')" || exit 1
 
-# Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "clubify.wsgi:application"]
+# Default to entrypoint script (for development)
+# Override in docker-compose.yml for production
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 

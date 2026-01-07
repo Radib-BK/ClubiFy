@@ -54,11 +54,18 @@ services:
       db:
         condition: service_healthy
     volumes:
+      # Mount source code for live reloading
+      - .:/app
+      # Mount static directory for Tailwind CSS changes
+      - ./static:/app/static
+      # Keep node_modules in a volume to avoid overwriting with host directory
+      - node_modules:/app/node_modules
+      # Keep staticfiles volume for collected static files
       - static_volume:/app/staticfiles
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             gunicorn --bind 0.0.0.0:8000 --workers 3 --threads 2 clubify.wsgi:application"
+    # Use entrypoint script for development (runs Tailwind watch + Django runserver)
+    # For production, override with: command: gunicorn --bind 0.0.0.0:8000 --workers 3 --threads 2 clubify.wsgi:application
 
 volumes:
   postgres_data:
   static_volume:
+  node_modules:

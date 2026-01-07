@@ -16,10 +16,10 @@ A Django-based club management platform where users can create clubs, manage mem
 
 - Django 4.1.2
 - PostgreSQL
-- Tailwind CSS
+- Tailwind CSS (with live reloading in Docker)
 - Gunicorn (production)
 - WhiteNoise (static files)
-- Docker
+- Docker (with live code & CSS reloading)
 
 ---
 
@@ -41,9 +41,14 @@ A Django-based club management platform where users can create clubs, manage mem
 
 ### Prerequisites
 
+**For Local Development:**
 - Python 3.10+
 - PostgreSQL 13+
-- Node.js (for Tailwind CSS, optional)
+- Node.js (for Tailwind CSS)
+
+**For Docker Setup:**
+- Docker and Docker Compose
+- (Node.js and Python are included in the container)
 
 ---
 
@@ -119,7 +124,9 @@ Admin panel at `http://localhost:8000/admin`
 
 ---
 
-### Option 2: Docker Setup
+### Option 2: Docker Setup (Recommended for Development)
+
+The Docker setup includes **live reloading** for both code and Tailwind CSS changes - no need to rebuild containers!
 
 #### 1. Clone the repository
 
@@ -134,7 +141,7 @@ Create a `.env` file to override defaults:
 
 ```bash
 SECRET_KEY=your-secret-key-here
-DEBUG=False
+DEBUG=True
 DB_NAME=clubify_db
 DB_USER=postgres
 DB_PASSWORD=9084
@@ -150,7 +157,8 @@ docker-compose up -d --build
 
 This starts:
 - PostgreSQL database on port 5433
-- Django application on port 8001
+- Django application on port 8001 (with auto-reload enabled)
+- Tailwind CSS watch mode (auto-compiles CSS on changes)
 - Migrations run automatically on container startup
 
 #### 4. Create superuser (admin account)
@@ -164,26 +172,49 @@ docker-compose exec web python manage.py createsuperuser
 - Application: `http://localhost:8001`
 - Admin panel: `http://localhost:8001/admin`
 
+#### Live Reloading Features
+
+The Docker setup automatically reloads changes:
+
+- **Python/Django code changes** → Django development server auto-reloads (no restart needed)
+- **Tailwind CSS changes** (`static/src/input.css`) → Automatically compiled to `static/css/output.css` (no restart needed)
+- **Template/HTML changes** → Django auto-reloads
+
+Just save your files and see changes instantly in the browser!
+
 #### Docker commands reference
 
 ```bash
 # Start containers
 docker-compose up -d
 
-# Start with rebuild (after code changes)
+# Start with rebuild (first time or after Dockerfile changes)
 docker-compose up -d --build
+
+# View logs (see both Django and Tailwind processes)
+docker-compose logs -f web
 
 # Run migrations manually (if needed)
 docker-compose exec web python manage.py migrate
 
-# View logs
-docker-compose logs -f web
+# Run Django management commands
+docker-compose exec web python manage.py <command>
 
 # Stop containers
 docker-compose down
 
-# Stop and remove database volume
+# Stop and remove all volumes (including database)
 docker-compose down -v
+```
+
+#### Production Deployment
+
+For production, modify `docker-compose.yml` to use Gunicorn instead of the development server:
+
+```yaml
+web:
+  # ... other config ...
+  command: gunicorn --bind 0.0.0.0:8000 --workers 3 --threads 2 clubify.wsgi:application
 ```
 
 ---
