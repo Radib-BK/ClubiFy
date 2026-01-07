@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown_extras %}
 
 {% block title %}{{ post.title }} - {{ club.name }} - ClubiFy{% endblock %}
 
@@ -77,8 +78,8 @@
         </div>
 
         <div id="post-content-wrapper">
-            <div id="post-content" class="text-gray-700 text-sm sm:text-base m-0 p-0">
-                <div class="m-0 p-0">{{ post.body }}</div>
+            <div id="post-content" class="text-gray-700 text-sm sm:text-base m-0 p-0 prose prose-sm sm:prose-base lg:prose-lg max-w-none">
+                <div class="m-0 p-0">{{ post.body|markdown }}</div>
             </div>
         </div>
     </article>

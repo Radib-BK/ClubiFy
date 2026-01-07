@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown_extras %}
 
 {% block title %}Browse Clubs - ClubiFy{% endblock %}
 
@@ -60,7 +61,7 @@
                 {{ club.name }}
             </h3>
             <p class="text-gray-600 text-sm mt-2 line-clamp-2">
-                {{ club.description|truncatewords:20 }}
+                {{ club.description|markdown_to_text|truncatewords:20 }}
             </p>
             <div class="mt-auto pt-4 flex items-center justify-between text-xs text-gray-500 border-t border-gray-100">
                 <span>Created {{ club.created_at|date:"M j, Y" }}</span>

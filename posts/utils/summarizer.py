@@ -23,9 +23,17 @@ def get_nlp():
 
 
 def clean_sentence(text):
-    """Clean sentence by removing leading conjunctions and extra whitespace."""
+    """Clean sentence by removing leading conjunctions, markdown headers, and extra whitespace."""
     text = text.strip()
     text = re.sub(r"^(But|And|So|Because|However|Although|Though)\s+", "", text, flags=re.IGNORECASE)
+    text = re.sub(r'^#{1,6}\s+', '', text)
+    text = re.sub(r'\*\*([^\*]+)\*\*', r'\1', text)
+    text = re.sub(r'__([^_]+)__', r'\1', text)
+    text = re.sub(r'\*([^\*]+)\*', r'\1', text)
+    text = re.sub(r'_([^_]+)_', r'\1', text)
+    text = re.sub(r'`([^`]+)`', r'\1', text)
+    text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
+    text = text.strip()
     return text
 
 
@@ -81,5 +89,10 @@ def summarize_text(text, limit_sentences=None):
         selected = [s for s in selected if s]
     
     summary = ' '.join(selected).strip()
+    
+    summary = re.sub(r'\s+', ' ', summary)
+    summary = re.sub(r'\s*##+\s*', ' ', summary)
+    summary = summary.strip()
+    
     return summary if summary else text[:300] + "..." if len(text) > 300 else text
 

@@ -94,6 +94,12 @@ class ClubDetailView(DetailView):
         context['blog_total'] = blog_qs.count()
         context['news_posts'] = news_qs[:3]
         context['blog_posts'] = blog_qs[:3]
+        
+        pending_requests_count = MembershipRequest.objects.filter(
+            club=club,
+            status=RequestStatus.PENDING
+        ).count()
+        context['pending_requests_count'] = pending_requests_count
 
         return context
 

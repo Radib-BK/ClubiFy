@@ -5,4 +5,5 @@ gunicorn>=21.2.0
 whitenoise>=6.6.0
 spacy>=3.7.0
 pytextrank>=3.3.0
+markdown>=3.5.0
 

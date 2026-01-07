@@ -16,7 +16,7 @@ class BlogPostForm(forms.ModelForm):
             'body': forms.Textarea(attrs={
                 'class': 'input',
                 'rows': 10,
-                'placeholder': 'Write your blog post here...'
+                'placeholder': 'Write your blog post here...\n\nYou can use Markdown formatting:\n**Bold**, *italic*, # Headers, [links](url), - lists, `code`'
             }),
         }
 
@@ -38,7 +38,7 @@ class NewsPostForm(forms.ModelForm):
             'body': forms.Textarea(attrs={
                 'class': 'input',
                 'rows': 10,
-                'placeholder': 'Write your post content here...'
+                'placeholder': 'Write your post content here...\n\nYou can use Markdown formatting:\n**Bold**, *italic*, # Headers, [links](url), - lists, `code`'
             }),
         }
 
