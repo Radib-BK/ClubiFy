@@ -80,7 +80,7 @@
                             <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
                             <p class="text-xs text-gray-400 mt-2">
-                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="text-primary-600">Read more →</span>
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
                             </p>
                         </a>
                         {% endfor %}
@@ -121,7 +121,7 @@
                             <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
                             <p class="text-xs text-gray-400 mt-2">
-                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="text-primary-600">Read more →</span>
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
                             </p>
                         </a>
                         {% endfor %}
