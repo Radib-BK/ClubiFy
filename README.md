@@ -1,7 +1,14 @@
-<h1>
-  <img src="screenshots/clubify_logo.png" alt="ClubiFy logo" height="36" style="vertical-align:  middle; margin-right: 10px;">
-  ClubiFy
-</h1>
+<table>
+  <tr>
+    <td>
+      <img src="screenshots/clubify_logo.png" alt="ClubiFy logo" height="64">
+    </td>
+    <td>
+      <h1>ClubiFy</h1>
+    </td>
+  </tr>
+</table>
+
 
 ## A Django-powered club management platform for discovering clubs, managing role-based memberships, and publishing news/blog posts.
 
