@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img src="screenshots/clubify_logo.svg" alt="ClubiFy logo" height="52">
+      <img src="screenshots/clubify_logo.png" alt="ClubiFy logo" height="52">
     </td>
     <td>
       <h1>ClubiFy</h1>
