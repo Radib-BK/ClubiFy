@@ -100,8 +100,8 @@
 #### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/clubify.git
-cd clubify
+git clone https://github.com/Radib-BK/ClubiFy.git
+cd ClubiFy
 ```
 
 #### 2. Create virtual environment
