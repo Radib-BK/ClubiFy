@@ -1,5 +1,5 @@
 <h1>
-  <img src="screenshots/clubify_logo.png" alt="ClubiFy logo" height="52" style="vertical-align:  middle; margin-right: 10px;">
+  <img src="screenshots/clubify_logo.png" alt="ClubiFy logo" height="36" style="vertical-align:  middle; margin-right: 10px;">
   ClubiFy
 </h1>
 
