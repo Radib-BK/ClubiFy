@@ -1,17 +1,25 @@
-# ClubiFy
+<table>
+  <tr>
+    <td>
+      <img src="static/Images/clubify_logo.svg" alt="ClubiFy logo" height="52">
+    </td>
+    <td>
+      <h1>ClubiFy</h1>
+    </td>
+  </tr>
+</table>
 
-A Django-powered club management platform for discovering clubs, managing role-based memberships, and publishing news/blog posts.
+## A Django-powered club management platform for discovering clubs, managing role-based memberships, and publishing news/blog posts.
 
----
 
 ## Highlights
 - Authentication (signup, login, logout)
 - Create and browse clubs
 - Role-based memberships (Admin, Moderator, Member)
-- Membership requests with approve/reject workflow
-- Publish blog posts (members) and news posts (mods/admins)
+- Membership requests with approve / reject workflow
+- Publish blog posts (members) and news posts (mods / admins)
 - Delete posts (mods/admins) and remove members (admins)
-- AI post summarizer (spaCy + PyTextRank fallback)
+- AI post summarizer
 - User profiles with memberships and pending requests
 - Responsive UI with Tailwind CSS
 
