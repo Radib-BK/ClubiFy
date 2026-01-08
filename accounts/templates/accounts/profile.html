@@ -96,8 +96,8 @@
                         <h3 class="font-medium text-gray-900">{{ req.club.name }}</h3>
                         <p class="text-sm text-gray-500">Requested {{ req.requested_at|timesince }} ago</p>
                     </div>
-                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
-                        ⏳ Pending
+                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                        <i class="fas fa-hourglass-half"></i> Pending
                     </span>
                 </div>
                 {% endfor %}
