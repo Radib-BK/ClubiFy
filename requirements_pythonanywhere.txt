@@ -1,0 +1,16 @@
+# Lightweight requirements for PythonAnywhere (without heavy AI dependencies)
+# Use this if you encounter disk quota issues
+
+Django==4.1.2
+mysqlclient>=2.1.0  # MySQL driver (for PythonAnywhere free accounts)
+python-dotenv>=1.0.0
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+markdown>=3.5.0
+
+# Optional: Uncomment if you have enough disk space and need AI features
+# spacy>=3.7.0
+# pytextrank>=3.3.0
+
+# Note: PostgreSQL driver not needed for free accounts (MySQL only)
+# psycopg2-binary>=2.9.9  # Only needed for PostgreSQL

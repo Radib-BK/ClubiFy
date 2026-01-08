@@ -21,15 +21,16 @@ This guide will walk you through deploying your ClubiFy Django project to Python
 1. **In PythonAnywhere Bash Console:**
    ```bash
    cd ~
-   git clone https://github.com/yourusername/ClubiFy.git
-   # Or use your Git repository URL
+   git clone -b Deploy-Python https://github.com/Radib-BK/ClubiFy.git
    cd ClubiFy
    ```
+   
+   **Note:** This clones the `Deploy-Python` branch which contains all the deployment-ready code.
 
 ### Option B: Using Files Tab
 
 1. Go to the **Files** tab in PythonAnywhere
-2. Navigate to `/home/yourusername/`
+2. Navigate to `/home/radibbk/`
 3. Upload your project files (or use the upload button)
 
 ## Step 3: Set Up Virtual Environment
@@ -52,17 +53,40 @@ This guide will walk you through deploying your ClubiFy Django project to Python
 ## Step 4: Install Dependencies
 
 1. **Still in the virtual environment:**
-   ```bash
-   # Install MySQL client if using MySQL (free accounts)
-   pip install mysqlclient
    
-   # Install all other dependencies
-   pip install -r requirements.txt
+   **⚠️ IMPORTANT: Free PythonAnywhere accounts have limited disk space (~512MB).**
+   The full `requirements.txt` includes spacy/scipy which are very large (~500MB+).
+   
+   **Option A: Install lightweight version (Recommended for free accounts):**
+   ```bash
+   # Install without cache to save space
+   pip install --no-cache-dir -r requirements_pythonanywhere.txt
+   ```
+   This skips spacy/pytextrank (AI features won't work, but the app will run).
+   
+   **Option B: Install full requirements (if you have space):**
+   ```bash
+   # Install MySQL client first
+   pip install --no-cache-dir mysqlclient
+   
+   # Install all dependencies without cache
+   pip install --no-cache-dir -r requirements.txt
+   ```
+   
+   **Option C: Install core packages first, then spacy separately:**
+   ```bash
+   # Core packages
+   pip install --no-cache-dir Django==4.1.2 mysqlclient python-dotenv gunicorn whitenoise markdown
+   
+   # Then try spacy if you have space (optional)
+   pip install --no-cache-dir spacy
+   python -m spacy download en_core_web_sm
+   pip install --no-cache-dir pytextrank
    ```
 
-   **Note:** If you're using MySQL (free accounts), you may need to install `mysqlclient`. If that fails, try:
+   **Note:** If `mysqlclient` installation fails, try:
    ```bash
-   pip install pymysql
+   pip install --no-cache-dir pymysql
    ```
    Then add this to your `settings.py` (already handled in the updated settings):
    ```python
@@ -89,14 +113,16 @@ This guide will walk you through deploying your ClubiFy Django project to Python
    ```env
    SECRET_KEY=your-secret-key-here
    DEBUG=False
-   PA_USERNAME=yourusername
+   PA_USERNAME=radibbk
    DB_ENGINE=mysql
-   DB_NAME=yourusername$clubify_db
-   DB_USER=yourusername
+   DB_NAME=radibbk$clubify
+   DB_USER=radibbk
    DB_PASSWORD=your-database-password
-   DB_HOST=yourusername.mysql.pythonanywhere-services.com
+   DB_HOST=radibbk.mysql.pythonanywhere-services.com
    DB_PORT=3306
    ```
+   
+   **Note:** Replace `your-database-password` with your actual MySQL database password from PythonAnywhere.
 
 ### For PostgreSQL (Paid Accounts):
 
@@ -151,7 +177,7 @@ This guide will walk you through deploying your ClubiFy Django project to Python
    import sys
    
    # Add your project directory to the Python path
-   path = '/home/yourusername/ClubiFy'  # CHANGE 'yourusername' to your actual username
+   path = '/home/radibbk/ClubiFy'
    if path not in sys.path:
        sys.path.insert(0, path)
    
@@ -159,7 +185,7 @@ This guide will walk you through deploying your ClubiFy Django project to Python
    os.environ['DJANGO_SETTINGS_MODULE'] = 'clubify.settings'
    
    # Set PythonAnywhere username
-   os.environ['PA_USERNAME'] = 'yourusername'  # CHANGE 'yourusername' to your actual username
+   os.environ['PA_USERNAME'] = 'radibbk'
    
    # Import Django's WSGI application
    from django.core.wsgi import get_wsgi_application
@@ -167,27 +193,27 @@ This guide will walk you through deploying your ClubiFy Django project to Python
    ```
 
    **OR** use the provided `wsgi_pythonanywhere.py` file:
-   - Edit `/home/yourusername/ClubiFy/clubify/wsgi_pythonanywhere.py`
-   - Replace `yourusername` with your actual PythonAnywhere username
-   - Point the WSGI configuration file to: `/home/yourusername/ClubiFy/clubify/wsgi_pythonanywhere.py`
+   - Edit `/home/radibbk/ClubiFy/clubify/wsgi_pythonanywhere.py`
+   - Replace `yourusername` with `radibbk` (should already be updated)
+   - Point the WSGI configuration file to: `/home/radibbk/ClubiFy/clubify/wsgi_pythonanywhere.py`
 
 ## Step 9: Configure Web App
 
 1. **In PythonAnywhere Web tab:**
-   - **Source code:** `/home/yourusername/ClubiFy`
-   - **Working directory:** `/home/yourusername/ClubiFy`
-   - **WSGI configuration file:** `/home/yourusername/ClubiFy/clubify/wsgi_pythonanywhere.py`
-   - **Virtualenv:** `/home/yourusername/ClubiFy/venv`
+   - **Source code:** `/home/radibbk/ClubiFy`
+   - **Working directory:** `/home/radibbk/ClubiFy`
+   - **WSGI configuration file:** `/home/radibbk/ClubiFy/clubify/wsgi_pythonanywhere.py`
+   - **Virtualenv:** `/home/radibbk/ClubiFy/venv`
 
 ## Step 10: Configure Static Files Mapping
 
 1. **In PythonAnywhere Web tab, add Static files mapping:**
    - **URL:** `/static/`
-   - **Directory:** `/home/yourusername/ClubiFy/staticfiles`
+   - **Directory:** `/home/radibbk/ClubiFy/staticfiles`
 
 2. **If you have media files, add Media files mapping:**
    - **URL:** `/media/`
-   - **Directory:** `/home/yourusername/ClubiFy/media`
+   - **Directory:** `/home/radibbk/ClubiFy/media`
 
 ## Step 11: Reload Web App
 
@@ -197,7 +223,7 @@ This guide will walk you through deploying your ClubiFy Django project to Python
 
 ## Step 12: Test Your Application
 
-1. Visit your website: `https://yourusername.pythonanywhere.com`
+1. Visit your website: `https://radibbk.pythonanywhere.com`
 2. Test the main functionality
 3. Check error logs if something doesn't work:
    - Go to **Web** tab → **Error log** link
@@ -226,13 +252,44 @@ This guide will walk you through deploying your ClubiFy Django project to Python
    - Verify `ALLOWED_HOSTS` includes your domain
    - Check `.env` file exists and has correct values
 
-5. **Module Not Found (spacy/pytextrank):**
-   - These packages can be large. If installation fails:
-     ```bash
-     pip install --no-cache-dir spacy
-     python -m spacy download en_core_web_sm
-     ```
-   - Or consider removing these dependencies if not critical
+5. **Disk Quota Exceeded (spacy/scipy installation):**
+   - This is common on free PythonAnywhere accounts. Solutions:
+   
+   **Option A: Install without cache (saves space):**
+   ```bash
+   pip install --no-cache-dir -r requirements.txt
+   ```
+   
+   **Option B: Install essential packages first, skip spacy if not critical:**
+   ```bash
+   # Install core dependencies first
+   pip install --no-cache-dir Django==4.1.2 mysqlclient python-dotenv gunicorn whitenoise markdown
+   
+   # If you need spacy, install it separately (it's very large ~500MB+)
+   pip install --no-cache-dir spacy
+   python -m spacy download en_core_web_sm
+   ```
+   
+   **Option C: Use lightweight requirements (skip AI features):**
+   ```bash
+   # Use requirements_pythonanywhere.txt instead (see below)
+   pip install --no-cache-dir -r requirements_pythonanywhere.txt
+   ```
+   
+   **Option D: Clean up space first:**
+   ```bash
+   # Remove pip cache
+   rm -rf ~/.cache/pip
+   
+   # Remove old virtual environments if any
+   # Then try installing again with --no-cache-dir
+   ```
+   
+   **Note:** If AI summarization is not critical, you can skip spacy/pytextrank entirely. The app will work without them, but the AI summarize feature won't be available.
+
+6. **Module Not Found (spacy/pytextrank):**
+   - If you skipped installing spacy, the AI summarize feature won't work
+   - You can add error handling in your views to gracefully handle missing spacy
 
 ### Viewing Logs:
 
@@ -247,8 +304,10 @@ When you make changes to your code:
 1. **Pull latest changes (if using Git):**
    ```bash
    cd ~/ClubiFy
-   git pull
+   git pull origin Deploy-Python
    ```
+   
+   **Note:** Make sure you're pulling from the `Deploy-Python` branch.
 
 2. **Run migrations if needed:**
    ```bash

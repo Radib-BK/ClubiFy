@@ -3,16 +3,27 @@ Text summarization utility using spaCy and PyTextRank.
 """
 import os
 import re
-import spacy
-import pytextrank
 
 os.environ.setdefault('GIT_PYTHON_REFRESH', 'quiet')
+
+# Try to import spacy and pytextrank, but handle gracefully if not available
+try:
+    import spacy
+    import pytextrank
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+    spacy = None
+    pytextrank = None
 
 _nlp = None
 
 def get_nlp():
     """Get or initialize the spaCy NLP model with TextRank pipeline."""
     global _nlp
+    if not SPACY_AVAILABLE:
+        raise ImportError("spacy and pytextrank are not installed. Install them to use AI summarization.")
+    
     if _nlp is None:
         try:
             _nlp = spacy.load("en_core_web_md")
@@ -46,12 +57,20 @@ def summarize_text(text, limit_sentences=None):
         limit_sentences: Number of sentences in summary (auto-calculated if None)
     
     Returns:
-        str: Summarized text
+        str: Summarized text or original text if spacy is not available
     """
     if not text or len(text.strip()) < 50:
         return text
     
-    nlp = get_nlp()
+    if not SPACY_AVAILABLE:
+        # Fallback: return first 300 characters if spacy is not available
+        return text[:300] + "..." if len(text) > 300 else text
+    
+    try:
+        nlp = get_nlp()
+    except ImportError:
+        # Fallback if spacy models are not downloaded
+        return text[:300] + "..." if len(text) > 300 else text
     doc = nlp(text)
     sentences = list(doc.sents)
     sentence_count = len(sentences)
