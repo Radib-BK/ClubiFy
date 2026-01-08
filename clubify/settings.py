@@ -24,7 +24,32 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-change-in-pro
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# Detect if running on PythonAnywhere
+# PythonAnywhere sets PYTHONANYWHERE_DOMAIN environment variable
+# We also check for PA_USERNAME which should be set in the WSGI file
+ON_PYTHONANYWHERE = (
+    'PYTHONANYWHERE_DOMAIN' in os.environ or 
+    os.getenv('PA_USERNAME', '') != ''
+)
+
+# Configure ALLOWED_HOSTS
+if ON_PYTHONANYWHERE:
+    # Get your PythonAnywhere username (should be set in WSGI file or .env)
+    PA_USERNAME = os.getenv('PA_USERNAME', os.environ.get('USER', ''))
+    
+    if PA_USERNAME:
+        ALLOWED_HOSTS = [
+            f'{PA_USERNAME}.pythonanywhere.com',
+            'www.pythonanywhere.com',
+        ]
+    else:
+        # Fallback - will need to be set manually if detection fails
+        ALLOWED_HOSTS = ['*.pythonanywhere.com']
+    
+    # Disable debug on PythonAnywhere
+    DEBUG = False
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -45,7 +70,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,6 +77,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Add WhiteNoise only if not on PythonAnywhere (PythonAnywhere serves static files directly)
+if not ON_PYTHONANYWHERE:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'clubify.urls'
 
@@ -78,16 +106,49 @@ WSGI_APPLICATION = 'clubify.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'clubify_db'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+if ON_PYTHONANYWHERE:
+    # PythonAnywhere database configuration
+    # Free accounts use MySQL, paid accounts can use PostgreSQL
+    DB_ENGINE = os.getenv('DB_ENGINE', 'mysql')  # 'mysql' or 'postgresql'
+    
+    if DB_ENGINE == 'mysql':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': os.getenv('DB_NAME', ''),
+                'USER': os.getenv('DB_USER', ''),
+                'PASSWORD': os.getenv('DB_PASSWORD', ''),
+                'HOST': os.getenv('DB_HOST', ''),
+                'PORT': os.getenv('DB_PORT', '3306'),
+                'OPTIONS': {
+                    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                },
+            }
+        }
+    else:
+        # PostgreSQL for paid PythonAnywhere accounts
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.getenv('DB_NAME', ''),
+                'USER': os.getenv('DB_USER', ''),
+                'PASSWORD': os.getenv('DB_PASSWORD', ''),
+                'HOST': os.getenv('DB_HOST', ''),
+                'PORT': os.getenv('DB_PORT', '5432'),
+            }
+        }
+else:
+    # Local development - PostgreSQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'clubify_db'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
     }
-}
 
 
 # Password validation
@@ -124,12 +185,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise for serving static files in production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Media files (user uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Static files configuration for PythonAnywhere
+if ON_PYTHONANYWHERE:
+    # PythonAnywhere serves static files directly, so we don't need WhiteNoise
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    # WhiteNoise for serving static files in production (non-PythonAnywhere)
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Default primary key field type

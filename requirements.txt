@@ -1,9 +1,15 @@
 Django==4.1.2
-psycopg2-binary>=2.9.9
+psycopg2-binary>=2.9.9  # PostgreSQL driver (for local dev and paid PythonAnywhere)
+mysqlclient>=2.1.0  # MySQL driver (for PythonAnywhere free accounts)
 python-dotenv>=1.0.0
 gunicorn>=21.2.0
 whitenoise>=6.6.0
 spacy>=3.7.0
 pytextrank>=3.3.0
 markdown>=3.5.0
+
+# Note: For PythonAnywhere free accounts using MySQL, if mysqlclient installation fails,
+# you can use pymysql instead:
+# pymysql>=1.0.0
+# Then add this to settings.py: import pymysql; pymysql.install_as_MySQLdb()
 
