@@ -1,10 +1,15 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="min-h-screen">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ClubiFy{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'Images/clubify_logo.svg' %}">
+    <link rel="alternate icon" href="{% static 'Images/clubify_logo.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'Images/clubify_logo.svg' %}">
     
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,17 +25,15 @@
     <!-- Tailwind CSS -->
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
-<body class="h-full bg-cream-50 font-sans pt-16">
+<body class="bg-cream-50 font-sans min-h-screen flex flex-col">
     <!-- Navigation (Fixed) -->
     <nav class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="{% url 'clubs:club_list' %}" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-primary-700 rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">C</span>
-                        </div>
+                    <a href="{% url 'clubs:club_list' %}" class="flex items-center space-x-0">
+                        <img src="{% static 'Images/clubify_logo.svg' %}" alt="ClubiFy Logo" class="w-10 h-10">
                         <span class="text-xl font-bold text-primary-700">ClubiFy</span>
                     </a>
                 </div>
@@ -129,30 +132,32 @@
         </div>
     </nav>
     
-    <!-- Messages -->
-    {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        {% for message in messages %}
-        <div class="rounded-lg p-4 mb-2 {% if message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {% block content %}{% endblock %}
+    <main class="flex-1 pt-16">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+            <div class="rounded-lg p-4 mb-2 {% if message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {% block content %}{% endblock %}
+        </div>
     </main>
-    
+
     <!-- Footer -->
-    {% comment %} <footer class="bg-white border-t border-gray-200 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <p class="text-center text-gray-500 text-sm">
-                &copy; 2025 ClubiFy. Built with Django.
+                &copy; 2025 ClubiFy. Built by <span class="font-medium text-gray-700">Radib Bin Kabir</span>.
             </p>
         </div>
-    </footer> {% endcomment %}
+    </footer>
 
     <!-- Mobile menu toggle script -->
     <script>
