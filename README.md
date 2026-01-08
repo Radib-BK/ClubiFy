@@ -6,9 +6,13 @@
     <td>
       <h1>ClubiFy</h1>
     </td>
+    <td align="right">
+      <a href="https://radibbk.pythonanywhere.com/">
+        <img src="https://img.shields.io/badge/Live_Demo-1E40AF?style=for-the-badge&logo=globe&logoColor=white" alt="Live Demo">
+      </a>
+    </td>
   </tr>
 </table>
-
 
 ## A Django-powered club management platform for discovering clubs, managing role-based memberships, and publishing news/blog posts.
 
@@ -35,11 +39,11 @@
 ---
 
 ## Quick Links
+- [🌐 Live Demo](https://radibbk.pythonanywhere.com/)
 - [Screenshots](#screenshots-user-flow)
 - [Setup (Local)](#option-1-local-development-setup)
-- [Setup (Docker)](#option-2-docker-setup-recommended-for-development)
+- [Setup (Docker)](#option-2-docker-setup-recommended)
 - [Project Structure](#project-structure)
-- [Role Permissions](#role-permissions)
 
 ---
 
