@@ -4,6 +4,7 @@ Text summarization utility using Hugging Face transformers with fallback to spaC
 import os
 import re
 import logging
+import threading
 
 os.environ.setdefault('GIT_PYTHON_REFRESH', 'quiet')
 
@@ -11,42 +12,66 @@ logger = logging.getLogger(__name__)
 
 # Hugging Face summarizer
 _hf_summarizer = None
+_hf_lock = threading.Lock()
 
 # spaCy NLP model
 _nlp = None
+_nlp_lock = threading.Lock()
 
 def get_hf_summarizer():
     """Get or initialize the Hugging Face summarization pipeline."""
     global _hf_summarizer
     if _hf_summarizer is None:
-        try:
-            from transformers import pipeline
-            _hf_summarizer = pipeline("summarization", model="Falconsai/text_summarization")
-        except Exception as e:
-            logger.warning(f"Failed to initialize Hugging Face summarizer: {e}")
-            _hf_summarizer = False  # Set to False to indicate it's unavailable
+        with _hf_lock:
+            # Double-check pattern to avoid race conditions
+            if _hf_summarizer is None:
+                try:
+                    from transformers import pipeline
+                    logger.info("Loading Hugging Face summarization model (this may take 10-30 seconds on first load)...")
+                    _hf_summarizer = pipeline("summarization", model="Falconsai/text_summarization")
+                    logger.info("Hugging Face summarization model loaded successfully")
+                except Exception as e:
+                    logger.warning(f"Failed to initialize Hugging Face summarizer: {e}")
+                    _hf_summarizer = False  # Set to False to indicate it's unavailable
     return _hf_summarizer
+
+
+def preload_summarizer():
+    """Preload the summarizer models at startup to avoid first-request delay."""
+    try:
+        logger.info("Preloading summarization models...")
+        # Preload Hugging Face model
+        get_hf_summarizer()
+        # Preload spaCy model (optional, but good for consistency)
+        get_nlp()
+        logger.info("Summarization models preloaded successfully")
+    except Exception as e:
+        logger.warning(f"Failed to preload summarization models: {e}")
+        # Don't raise - allow the app to start even if models fail to load
 
 
 def get_nlp():
     """Get or initialize the spaCy NLP model with TextRank pipeline."""
     global _nlp
     if _nlp is None:
-        try:
-            import spacy
-            import pytextrank
-            _nlp = spacy.load("en_core_web_md")
-        except OSError:
-            try:
-                _nlp = spacy.load("en_core_web_sm")
-            except OSError:
-                _nlp = False  # Set to False to indicate it's unavailable
-                return _nlp
-        try:
-            _nlp.add_pipe("textrank")
-        except Exception as e:
-            logger.warning(f"Failed to add textrank pipe: {e}")
-            _nlp = False
+        with _nlp_lock:
+            # Double-check pattern to avoid race conditions
+            if _nlp is None:
+                try:
+                    import spacy
+                    import pytextrank
+                    _nlp = spacy.load("en_core_web_md")
+                except OSError:
+                    try:
+                        _nlp = spacy.load("en_core_web_sm")
+                    except OSError:
+                        _nlp = False  # Set to False to indicate it's unavailable
+                        return _nlp
+                try:
+                    _nlp.add_pipe("textrank")
+                except Exception as e:
+                    logger.warning(f"Failed to add textrank pipe: {e}")
+                    _nlp = False
     return _nlp
 
 
