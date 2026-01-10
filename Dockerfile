@@ -4,7 +4,7 @@
 # ============================================
 # Stage 1: Build stage
 # ============================================
-FROM python:3.12-slim AS builder
+FROM python:3.11-slim AS builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -26,7 +26,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.t
 # ============================================
 # Stage 2: Production stage
 # ============================================
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -40,7 +40,7 @@ RUN groupadd --gid 1000 appgroup && \
 # Set work directory
 WORKDIR /app
 
-# Install runtime dependencies including Node.js for Tailwind and git for pytextrank
+# Install runtime dependencies including Node.js for Tailwind
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
@@ -55,9 +55,6 @@ COPY --from=builder /app/requirements.txt .
 
 # Install dependencies from wheels
 RUN pip install --no-cache /wheels/*
-
-# Download spaCy English models for text summarization (medium model for better quality)
-RUN python -m spacy download en_core_web_md || python -m spacy download en_core_web_sm
 
 # Copy project files
 COPY --chown=appuser:appgroup . .

@@ -11,9 +11,12 @@ class PostsConfig(AppConfig):
     
     def ready(self):
         """Preload summarization models when Django starts."""
+        logger.info("PostsConfig.ready() called - initializing summarizer preload")
+        
         # Skip preloading during migrations and other management commands
         import sys
         if 'migrate' in sys.argv or 'makemigrations' in sys.argv or 'collectstatic' in sys.argv:
+            logger.info("Skipping summarizer preload (management command detected)")
             return
         
         # Check if preloading is disabled via environment variable
@@ -24,12 +27,13 @@ class PostsConfig(AppConfig):
         
         try:
             from posts.utils.summarizer import preload_summarizer
-            # Preload in background thread to avoid blocking server startup
-            # The model will be ready when first request comes in
-            import threading
-            thread = threading.Thread(target=preload_summarizer, daemon=True)
-            thread.start()
-            logger.info("Started background thread to preload summarization models")
+            # Preload models synchronously to ensure they're ready before server accepts requests
+            # This blocks startup but ensures first request is fast (takes ~30-60 seconds)
+            logger.info("Preloading summarization models synchronously (this may take 30-60 seconds)...")
+            preload_summarizer()
+            logger.info("✓ Summarization models preloaded successfully - server ready to accept requests")
         except Exception as e:
-            logger.warning(f"Could not start summarizer preload thread: {e}")
+            logger.error(f"✗ Failed to preload summarization models: {e}", exc_info=True)
+            # Continue anyway - models will load on first request (slower)
+            logger.warning("Server will start but first summarization request will be slow")
 

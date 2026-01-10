@@ -34,7 +34,7 @@
 
 | Backend | Frontend | Infra/Tooling |
 | --- | --- | --- |
-| ![Django](https://img.shields.io/badge/Django-092E20?logo=django&logoColor=white) ![Python](https://img.shields.io/badge/Python_3.10+-3776AB?logo=python&logoColor=white) | ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white) | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white) ![Gunicorn](https://img.shields.io/badge/Gunicorn-499848?logo=gunicorn&logoColor=white) ![WhiteNoise](https://img.shields.io/badge/WhiteNoise-555?logo=python&logoColor=white) |
+| ![Django](https://img.shields.io/badge/Django-092E20?logo=django&logoColor=white) ![Python](https://img.shields.io/badge/Python_3.10+-3776AB?logo=python&logoColor=white) ![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?logo=huggingface&logoColor=black) | ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white) | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white) ![Gunicorn](https://img.shields.io/badge/Gunicorn-499848?logo=gunicorn&logoColor=white) ![WhiteNoise](https://img.shields.io/badge/WhiteNoise-555?logo=python&logoColor=white) |
 
 ---
 
@@ -190,6 +190,19 @@ Access:
 Notes:
 - Code changes auto-reload; Tailwind auto-compiles.
 - To stop: `docker-compose down` (add `-v` to drop DB volume).
+- **AI Summarizer**: The Hugging Face model (`sshleifer/distilbart-cnn-12-6`) is preloaded at startup for fast summarization. First startup may take 20-40 seconds to download and load the model.
+
+### Configuration
+
+You can customize the summarizer via environment variables:
+
+```bash
+# Optional: Override the default model (default: sshleifer/distilbart-cnn-12-6)
+HF_SUMMARIZATION_MODEL=sshleifer/distilbart-cnn-12-6
+
+# Optional: Skip preloading (models load on first request instead of at startup)
+SKIP_SUMMARIZER_PRELOAD=false
+```
 
 ---
 

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'accounts',
     'clubs',
     'memberships',
-    'posts',
+    'posts.apps.PostsConfig',  # Use custom app config for preloading summarizer
 ]
 
 MIDDLEWARE = [

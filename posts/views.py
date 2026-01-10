@@ -160,7 +160,7 @@ def delete_post(request, slug, post_id):
 
 @require_http_methods(["POST"])
 def summarize_post(request, slug, post_id):
-    """Summarize a post using Hugging Face transformers with fallback to spaCy and PyTextRank - returns HTML fragment for HTMX."""
+    """Summarize a post using Hugging Face transformers - returns HTML fragment for HTMX."""
     import logging
     logger = logging.getLogger(__name__)
     
@@ -196,19 +196,18 @@ def summarize_post(request, slug, post_id):
             'summary': summary,
             'is_summarized': True,
             'is_fallback': True,
-            'error': 'Summarization library not available. Please install transformers, torch, spacy and PyTextRank.',
+            'error': 'Summarization library not available. Please install transformers and torch.',
         })
     except OSError as e:
         logger.error(f"OS error during summarization: {e}")
         summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
-        model_name = 'en_core_web_md' if 'md' in str(e) else 'en_core_web_sm'
         return render(request, 'posts/partials/post_content.html', {
             'club': club,
             'post': post,
             'summary': summary,
             'is_summarized': True,
             'is_fallback': True,
-            'error': f'Language model not found. Please download: python -m spacy download {model_name}',
+            'error': f'Summarization failed: {str(e)}',
         })
     except Exception as e:
         logger.error(f"Error during summarization: {e}", exc_info=True)
