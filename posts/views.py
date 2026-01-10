@@ -160,7 +160,10 @@ def delete_post(request, slug, post_id):
 
 @require_http_methods(["POST"])
 def summarize_post(request, slug, post_id):
-    """Summarize a post using spaCy and PyTextRank - returns HTML fragment for HTMX."""
+    """Summarize a post using Hugging Face Inference API - returns HTML fragment for HTMX."""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     club = get_object_or_404(Club, slug=slug)
     post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
     action = request.POST.get('action', 'summarize')
@@ -173,14 +176,26 @@ def summarize_post(request, slug, post_id):
         })
     
     try:
-        summary = summarize_text(post.body)
+        logger.info(f"Starting summarization for post {post_id}")
+        summary, is_fallback = summarize_text(post.body)
+        if not summary:
+            raise ValueError("Summarization returned empty result")
+        
+        if is_fallback:
+            logger.warning(f"Summarization used fallback (truncated text) for post {post_id}")
+        else:
+            logger.info(f"Summarization completed successfully using Hugging Face API for post {post_id}")
+            logger.info(f"Full summary content ({len(summary)} chars): {summary[:500]}...")  # Log first 500 chars
+        
         return render(request, 'posts/partials/post_content.html', {
             'club': club,
             'post': post,
             'summary': summary,
             'is_summarized': True,
+            'is_fallback': is_fallback,
         })
-    except ImportError:
+    except ImportError as e:
+        logger.error(f"Import error during summarization: {e}")
         summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
         return render(request, 'posts/partials/post_content.html', {
             'club': club,
@@ -188,20 +203,10 @@ def summarize_post(request, slug, post_id):
             'summary': summary,
             'is_summarized': True,
             'is_fallback': True,
-            'error': 'Summarization library not available. Please install spaCy and PyTextRank.',
-        })
-    except OSError as e:
-        summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
-        model_name = 'en_core_web_md' if 'md' in str(e) else 'en_core_web_sm'
-        return render(request, 'posts/partials/post_content.html', {
-            'club': club,
-            'post': post,
-            'summary': summary,
-            'is_summarized': True,
-            'is_fallback': True,
-            'error': f'Language model not found. Please download: python -m spacy download {model_name}',
+            'error': 'Summarization library not available. Please install huggingface_hub and set HF_TOKEN environment variable.',
         })
     except Exception as e:
+        logger.error(f"Error during summarization: {e}", exc_info=True)
         summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
         return render(request, 'posts/partials/post_content.html', {
             'club': club,

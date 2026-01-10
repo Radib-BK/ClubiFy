@@ -24,6 +24,33 @@
     
     <!-- Tailwind CSS -->
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    
+    <!-- HTMX Indicator Styles -->
+    <style>
+        /* Hide indicator by default - takes no space */
+        .htmx-indicator {
+            display: none !important;
+        }
+        /* Show indicator when request is active - multiple selectors to catch all cases */
+        .htmx-request .htmx-indicator,
+        .htmx-request.htmx-indicator,
+        form.htmx-request .htmx-indicator,
+        form.htmx-request #summarize-loading,
+        button.htmx-request .htmx-indicator,
+        button.htmx-request #summarize-loading,
+        #summarize-form.htmx-request #summarize-loading,
+        #summarize-form.htmx-request .htmx-indicator,
+        .htmx-request #summarize-loading {
+            display: inline-block !important;
+        }
+        /* Also handle when form has htmx-requesting class (some HTMX versions) */
+        .htmx-requesting .htmx-indicator,
+        .htmx-requesting #summarize-loading,
+        form.htmx-requesting .htmx-indicator,
+        form.htmx-requesting #summarize-loading {
+            display: inline-block !important;
+        }
+    </style>
 </head>
 <body class="bg-cream-50 font-sans min-h-screen flex flex-col">
     <!-- Navigation (Fixed) -->
