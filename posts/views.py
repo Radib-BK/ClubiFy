@@ -160,7 +160,10 @@ def delete_post(request, slug, post_id):
 
 @require_http_methods(["POST"])
 def summarize_post(request, slug, post_id):
-    """Summarize a post using spaCy and PyTextRank - returns HTML fragment for HTMX."""
+    """Summarize a post using Hugging Face transformers with fallback to spaCy and PyTextRank - returns HTML fragment for HTMX."""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     club = get_object_or_404(Club, slug=slug)
     post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
     action = request.POST.get('action', 'summarize')
@@ -173,14 +176,19 @@ def summarize_post(request, slug, post_id):
         })
     
     try:
+        logger.info(f"Starting summarization for post {post_id}")
         summary = summarize_text(post.body)
+        if not summary:
+            raise ValueError("Summarization returned empty result")
+        logger.info(f"Summarization completed successfully for post {post_id}")
         return render(request, 'posts/partials/post_content.html', {
             'club': club,
             'post': post,
             'summary': summary,
             'is_summarized': True,
         })
-    except ImportError:
+    except ImportError as e:
+        logger.error(f"Import error during summarization: {e}")
         summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
         return render(request, 'posts/partials/post_content.html', {
             'club': club,
@@ -188,9 +196,10 @@ def summarize_post(request, slug, post_id):
             'summary': summary,
             'is_summarized': True,
             'is_fallback': True,
-            'error': 'Summarization library not available. Please install spaCy and PyTextRank.',
+            'error': 'Summarization library not available. Please install transformers, torch, spacy and PyTextRank.',
         })
     except OSError as e:
+        logger.error(f"OS error during summarization: {e}")
         summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
         model_name = 'en_core_web_md' if 'md' in str(e) else 'en_core_web_sm'
         return render(request, 'posts/partials/post_content.html', {
@@ -202,6 +211,7 @@ def summarize_post(request, slug, post_id):
             'error': f'Language model not found. Please download: python -m spacy download {model_name}',
         })
     except Exception as e:
+        logger.error(f"Error during summarization: {e}", exc_info=True)
         summary = post.body[:300] + "..." if len(post.body) > 300 else post.body
         return render(request, 'posts/partials/post_content.html', {
             'club': club,

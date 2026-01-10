@@ -34,14 +34,18 @@
                 <form id="summarize-form" hx-post="{% url 'posts:summarize_post' slug=club.slug post_id=post.id %}" 
                       hx-target="#post-content-wrapper" 
                       hx-swap="innerHTML"
+                      hx-indicator="#summarize-loading"
                       class="inline-block">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="summarize" id="summarize-action-input">
                     <button type="submit" 
                             id="summarize-btn"
-                            class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-primary-700 bg-primary-50 border border-primary-300 rounded-lg shadow-sm hover:bg-primary-100 hover:border-primary-400 hover:shadow-md transition-all duration-200">
+                            class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-primary-700 bg-primary-50 border border-primary-300 rounded-lg shadow-sm hover:bg-primary-100 hover:border-primary-400 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                         <i class="fas fa-compress-alt text-xs"></i>
                         <span id="summarize-text">AI Summarize</span>
+                        <span id="summarize-loading" class="htmx-indicator ml-2">
+                            <i class="fas fa-spinner fa-spin text-xs"></i>
+                        </span>
                     </button>
                 </form>
                 {% endif %}

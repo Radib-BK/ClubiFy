@@ -1,24 +1,52 @@
 """
-Text summarization utility using spaCy and PyTextRank.
+Text summarization utility using Hugging Face transformers with fallback to spaCy and PyTextRank.
 """
 import os
 import re
-import spacy
-import pytextrank
+import logging
 
 os.environ.setdefault('GIT_PYTHON_REFRESH', 'quiet')
 
+logger = logging.getLogger(__name__)
+
+# Hugging Face summarizer
+_hf_summarizer = None
+
+# spaCy NLP model
 _nlp = None
+
+def get_hf_summarizer():
+    """Get or initialize the Hugging Face summarization pipeline."""
+    global _hf_summarizer
+    if _hf_summarizer is None:
+        try:
+            from transformers import pipeline
+            _hf_summarizer = pipeline("summarization", model="Falconsai/text_summarization")
+        except Exception as e:
+            logger.warning(f"Failed to initialize Hugging Face summarizer: {e}")
+            _hf_summarizer = False  # Set to False to indicate it's unavailable
+    return _hf_summarizer
+
 
 def get_nlp():
     """Get or initialize the spaCy NLP model with TextRank pipeline."""
     global _nlp
     if _nlp is None:
         try:
+            import spacy
+            import pytextrank
             _nlp = spacy.load("en_core_web_md")
         except OSError:
-            _nlp = spacy.load("en_core_web_sm")
-        _nlp.add_pipe("textrank")
+            try:
+                _nlp = spacy.load("en_core_web_sm")
+            except OSError:
+                _nlp = False  # Set to False to indicate it's unavailable
+                return _nlp
+        try:
+            _nlp.add_pipe("textrank")
+        except Exception as e:
+            logger.warning(f"Failed to add textrank pipe: {e}")
+            _nlp = False
     return _nlp
 
 
@@ -37,9 +65,50 @@ def clean_sentence(text):
     return text
 
 
-def summarize_text(text, limit_sentences=None):
+def summarize_with_hf(text, max_length=300, min_length=50):
     """
-    Summarize text using PyTextRank with improved sentence selection.
+    Summarize text using Hugging Face transformers.
+    
+    Args:
+        text: The text to summarize
+        max_length: Maximum length of the summary in tokens (default: 300)
+        min_length: Minimum length of the summary in tokens (default: 50)
+    
+    Returns:
+        str: Summarized text, or None if summarization fails
+    """
+    try:
+        summarizer = get_hf_summarizer()
+        if summarizer is False or summarizer is None:
+            return None
+        
+        # Truncate text if it's too long (model has 512 token limit)
+        # Roughly 1 token ≈ 4 characters, so ~2000 chars ≈ 500 tokens (safe margin)
+        if len(text) > 2000:
+            text = text[:2000]
+        
+        # Use max_new_tokens instead of max_length to avoid parameter conflicts
+        # Calculate appropriate max_new_tokens (roughly 40% of input length, capped at max_length)
+        result = summarizer(
+            text, 
+            max_new_tokens=max_length, 
+            min_length=min_length, 
+            do_sample=False
+        )
+        
+        if result and isinstance(result, list) and len(result) > 0:
+            summary = result[0].get('summary_text', '')
+            if summary:
+                return summary.strip()
+    except Exception as e:
+        logger.warning(f"Hugging Face summarization failed: {e}")
+    
+    return None
+
+
+def summarize_with_spacy(text, limit_sentences=None):
+    """
+    Summarize text using PyTextRank with improved sentence selection (fallback method).
     
     Args:
         text: The text to summarize
@@ -52,47 +121,85 @@ def summarize_text(text, limit_sentences=None):
         return text
     
     nlp = get_nlp()
-    doc = nlp(text)
-    sentences = list(doc.sents)
-    sentence_count = len(sentences)
+    if nlp is False:
+        return None
     
-    if limit_sentences is None:
-        if sentence_count <= 5:
-            limit = 2
-        elif sentence_count <= 10:
-            limit = 3
-        elif sentence_count <= 20:
-            limit = 4
+    try:
+        doc = nlp(text)
+        sentences = list(doc.sents)
+        sentence_count = len(sentences)
+        
+        if limit_sentences is None:
+            if sentence_count <= 5:
+                limit = 2
+            elif sentence_count <= 10:
+                limit = 3
+            elif sentence_count <= 20:
+                limit = 4
+            else:
+                limit = 5
         else:
-            limit = 5
-    else:
-        limit = limit_sentences
-    
-    ranked = list(doc._.textrank.summary(limit_sentences=limit * 2))
-    selected = []
-    used_paragraphs = set()
-    
-    for sent in ranked:
-        para_id = sent.start // 200
+            limit = limit_sentences
         
-        if para_id not in used_paragraphs or len(selected) < 2:
-            cleaned = clean_sentence(sent.text)
-            if cleaned:
-                selected.append(cleaned)
-                used_paragraphs.add(para_id)
+        ranked = list(doc._.textrank.summary(limit_sentences=limit * 2))
+        selected = []
+        used_paragraphs = set()
         
-        if len(selected) >= limit:
-            break
+        for sent in ranked:
+            para_id = sent.start // 200
+            
+            if para_id not in used_paragraphs or len(selected) < 2:
+                cleaned = clean_sentence(sent.text)
+                if cleaned:
+                    selected.append(cleaned)
+                    used_paragraphs.add(para_id)
+            
+            if len(selected) >= limit:
+                break
+        
+        if len(selected) < limit:
+            selected = [clean_sentence(sent.text) for sent in ranked[:limit]]
+            selected = [s for s in selected if s]
+        
+        summary = ' '.join(selected).strip()
+        
+        summary = re.sub(r'\s+', ' ', summary)
+        summary = re.sub(r'\s*##+\s*', ' ', summary)
+        summary = summary.strip()
+        
+        return summary if summary else text[:300] + "..." if len(text) > 300 else text
+    except Exception as e:
+        logger.warning(f"spaCy summarization failed: {e}")
+        return None
+
+
+def summarize_text(text, limit_sentences=None):
+    """
+    Summarize text using Hugging Face transformers first, with fallback to PyTextRank.
     
-    if len(selected) < limit:
-        selected = [clean_sentence(sent.text) for sent in ranked[:limit]]
-        selected = [s for s in selected if s]
+    Args:
+        text: The text to summarize
+        limit_sentences: Number of sentences in summary (for fallback method only)
     
-    summary = ' '.join(selected).strip()
+    Returns:
+        str: Summarized text
+    """
+    if not text or len(text.strip()) < 50:
+        return text
     
-    summary = re.sub(r'\s+', ' ', summary)
-    summary = re.sub(r'\s*##+\s*', ' ', summary)
-    summary = summary.strip()
+    # Try Hugging Face summarizer first
+    summary = summarize_with_hf(text)
     
-    return summary if summary else text[:300] + "..." if len(text) > 300 else text
+    if summary:
+        return summary
+    
+    # Fallback to spaCy/PyTextRank
+    logger.info("Falling back to spaCy/PyTextRank summarization")
+    summary = summarize_with_spacy(text, limit_sentences)
+    
+    if summary:
+        return summary
+    
+    # Final fallback: return truncated text
+    return text[:300] + "..." if len(text) > 300 else text
 

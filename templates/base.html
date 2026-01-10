@@ -24,6 +24,19 @@
     
     <!-- Tailwind CSS -->
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    
+    <!-- HTMX Indicator Styles -->
+    <style>
+        .htmx-indicator {
+            display: none;
+            transition: opacity 200ms ease-in;
+        }
+        .htmx-request .htmx-indicator,
+        .htmx-request.htmx-indicator {
+            display: inline-block;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body class="bg-cream-50 font-sans min-h-screen flex flex-col">
     <!-- Navigation (Fixed) -->

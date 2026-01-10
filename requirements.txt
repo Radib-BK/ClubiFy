@@ -6,4 +6,6 @@ whitenoise>=6.6.0
 spacy>=3.7.0
 pytextrank>=3.3.0
 markdown>=3.5.0
+transformers>=4.30.0
+torch>=2.0.0
 
