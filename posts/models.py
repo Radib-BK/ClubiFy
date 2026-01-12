@@ -32,6 +32,7 @@ class Post(models.Model):
         related_name='posts'
     )
     is_published = models.BooleanField(default=True)
+    summary = models.TextField(blank=True, null=True, help_text='AI-generated summary of the post')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

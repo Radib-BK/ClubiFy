@@ -127,6 +127,40 @@ def create_post(request, slug):
                 post.post_type = PostType.BLOG
             
             post.save()
+            
+            # Auto-summarize the post after creation (non-blocking - runs in background)
+            # If user clicks "AI Summarize" before this completes, summarize_post view will handle it
+            try:
+                import logging
+                import threading
+                logger = logging.getLogger(__name__)
+                
+                def generate_summary_async():
+                    """Generate summary in background thread."""
+                    try:
+                        # Refresh post from DB to ensure we have latest data
+                        post_refreshed = Post.objects.get(id=post.id)
+                        logger.info(f"Auto-summarizing post {post_refreshed.id} on creation (background)")
+                        summary = summarize_text(post_refreshed.body)
+                        if summary:
+                            post_refreshed.summary = summary
+                            post_refreshed.save(update_fields=['summary'])
+                            logger.info(f"Summary generated and saved for post {post_refreshed.id}")
+                        else:
+                            logger.warning(f"Summarization returned empty result for post {post_refreshed.id}")
+                    except Exception as e:
+                        logger.error(f"Failed to auto-summarize post {post.id} in background: {e}", exc_info=True)
+                
+                # Start summarization in background thread (non-blocking)
+                thread = threading.Thread(target=generate_summary_async, daemon=True)
+                thread.start()
+                logger.info(f"Started background summarization for post {post.id}")
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to start background summarization for post {post.id}: {e}", exc_info=True)
+                # Continue even if background thread fails - post is already saved
+            
             post_type_display = 'News' if post.is_news else 'Blog'
             messages.success(request, f'{post_type_display} post "{post.title}" created successfully!')
             return redirect('clubs:club_detail', slug=slug)
@@ -160,7 +194,9 @@ def delete_post(request, slug, post_id):
 
 @require_http_methods(["POST"])
 def summarize_post(request, slug, post_id):
-    """Summarize a post using Hugging Face transformers - returns HTML fragment for HTMX."""
+    """Summarize a post using Hugging Face transformers - returns HTML fragment for HTMX.
+    Uses cached summary from database if available, otherwise generates and stores it.
+    """
     import logging
     logger = logging.getLogger(__name__)
     
@@ -175,12 +211,28 @@ def summarize_post(request, slug, post_id):
             'is_summarized': False,
         })
     
+    # Check if summary exists in database (cached)
+    if post.summary:
+        logger.info(f"Using cached summary for post {post_id}")
+        return render(request, 'posts/partials/post_content.html', {
+            'club': club,
+            'post': post,
+            'summary': post.summary,
+            'is_summarized': True,
+        })
+    
+    # Generate summary on-demand if not cached
     try:
-        logger.info(f"Starting summarization for post {post_id}")
+        logger.info(f"Generating summary for post {post_id} (not cached)")
         summary = summarize_text(post.body)
         if not summary:
             raise ValueError("Summarization returned empty result")
-        logger.info(f"Summarization completed successfully for post {post_id}")
+        
+        # Store the generated summary in the database for future use
+        post.summary = summary
+        post.save(update_fields=['summary'])
+        logger.info(f"Summary generated and cached for post {post_id}")
+        
         return render(request, 'posts/partials/post_content.html', {
             'club': club,
             'post': post,
