@@ -10,11 +10,13 @@
     </div>
 
     <div class="card p-8">
-        <form method="post" class="space-y-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
             
             <div>
-                <label for="id_name" class="label">Club Name</label>
+                <label for="id_name" class="label flex items-center gap-1">
+                    Club Name <span class="text-red-500">*</span>
+                </label>
                 {{ form.name }}
                 {% if form.name.help_text %}
                     <p class="text-gray-500 text-sm mt-1">{{ form.name.help_text }}</p>
@@ -25,13 +27,64 @@
             </div>
 
             <div>
-                <label for="id_description" class="label">Description</label>
+                <label for="id_description" class="label flex items-center gap-1">
+                    Description <span class="text-red-500">*</span>
+                </label>
                 {{ form.description }}
                 {% if form.description.help_text %}
                     <p class="text-gray-500 text-sm mt-1">{{ form.description.help_text }}</p>
                 {% endif %}
                 {% if form.description.errors %}
                     <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_logo" class="label">
+                    Club Logo <span class="text-gray-400 text-sm font-normal">(optional)</span>
+                </label>
+                {{ form.logo }}
+                {% if form.logo.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.logo.help_text }}</p>
+                {% endif %}
+                {% if form.logo.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.logo.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <span class="label">
+                    Color Palette <span class="text-gray-400 text-sm font-normal">(optional)</span>
+                </span>
+                {% with selected_color=form.color.value|default:form.color.initial|default:'' %}
+                <div class="grid grid-cols-4 gap-3 mt-3 max-w-2xl">
+                    {% for value, label in form.color.field.choices %}
+                        <label for="color-option-{{ forloop.counter }}" class="color-option flex flex-col items-center gap-2 p-2 rounded-lg border cursor-pointer transition shadow-sm w-full {% if selected_color == value|stringformat:"s" %}border-primary-500 ring-2 ring-primary-200 bg-primary-50{% else %}border-gray-200 hover:border-primary-200{% endif %}">
+                            <input type="radio"
+                                   name="{{ form.color.html_name }}"
+                                   id="color-option-{{ forloop.counter }}"
+                                   value="{{ value }}"
+                                   class="sr-only color-radio"
+                                   {% if selected_color == value|stringformat:"s" %}checked{% endif %}
+                                   {% if not value %}data-random="true"{% endif %}>
+                            {% if value %}
+                                <span class="w-8 h-8 rounded-full border border-gray-200 shadow-inner" style="background-color: {{ value }};"></span>
+                                <span class="text-xs text-gray-600 text-center leading-tight">{{ value }}</span>
+                            {% else %}
+                                <span class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-[10px] text-gray-500 bg-gray-50">
+                                    Auto
+                                </span>
+                                <span class="text-xs text-gray-600 text-center leading-tight">Auto</span>
+                            {% endif %}
+                        </label>
+                    {% endfor %}
+                </div>
+                {% endwith %}
+                {% if form.color.help_text %}
+                    <p class="text-gray-500 text-sm mt-2">{{ form.color.help_text }}</p>
+                {% endif %}
+                {% if form.color.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.color.errors.0 }}</p>
                 {% endif %}
             </div>
 
@@ -84,4 +137,60 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const colorRadios = document.querySelectorAll('.color-radio');
+    const colorOptions = document.querySelectorAll('.color-option');
+    
+    // Initialize selected state on page load
+    colorRadios.forEach(radio => {
+        if (radio.checked) {
+            const label = radio.closest('.color-option');
+            if (label) {
+                label.classList.remove('border-gray-200');
+                label.classList.add('border-primary-500', 'ring-2', 'ring-primary-200', 'bg-primary-50');
+            }
+        }
+        
+        radio.addEventListener('change', function() {
+            // Remove selected state from all options
+            colorOptions.forEach(option => {
+                option.classList.remove('border-primary-500', 'ring-2', 'ring-primary-200', 'bg-primary-50');
+                option.classList.add('border-gray-200');
+            });
+            
+            // Add selected state to the checked option's label
+            if (this.checked) {
+                const label = this.closest('.color-option');
+                if (label) {
+                    label.classList.remove('border-gray-200');
+                    label.classList.add('border-primary-500', 'ring-2', 'ring-primary-200', 'bg-primary-50');
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Ensure color palette grid displays correctly */
+.color-option {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.grid.grid-cols-4 {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+}
+
+@media (max-width: 640px) {
+    .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+</style>
 {% endblock %}

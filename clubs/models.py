@@ -15,10 +15,10 @@ PASTEL_COLORS = [
     '#FFFFE5',  # Light Yellow
     '#FFE5F5',  # Light Magenta
     '#E5FFF0',  # Light Mint
-    '#F0E5FF',  # Light Lavender
     '#FFF0E5',  # Light Peach
     '#E5F5FF',  # Light Sky
 ]
+PASTEL_COLOR_CHOICES = [(color, color) for color in PASTEL_COLORS]
 
 
 class Club(models.Model):
@@ -29,6 +29,7 @@ class Club(models.Model):
     slug = models.SlugField(max_length=110, unique=True, blank=True)
     description = models.TextField()
     color = models.CharField(max_length=7, blank=True, help_text="Card background color (auto-generated)")
+    logo = models.ImageField(upload_to='club_logos/', blank=True, null=True)
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

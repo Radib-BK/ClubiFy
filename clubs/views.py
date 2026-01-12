@@ -1,14 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 
 from .models import Club
 from .forms import ClubForm
 from memberships.models import Membership, MembershipRequest, RequestStatus
-from memberships.helpers import is_club_moderator
+from memberships.helpers import is_club_moderator, is_club_admin
 from posts.models import Post, PostType
 
 
@@ -62,8 +63,10 @@ class ClubDetailView(DetailView):
         context['display_members'] = []
         context['has_more_members'] = False
         context['can_create_news'] = False
+        context['can_edit_club'] = False
 
         if user.is_authenticated:
+            context['can_edit_club'] = is_club_admin(user, club)
             membership = Membership.objects.filter(user=user, club=club).first()
             if membership:
                 context['is_member'] = True
@@ -71,6 +74,7 @@ class ClubDetailView(DetailView):
                 context['display_members'] = club.memberships.select_related('user')[:4]
                 context['has_more_members'] = club.memberships.count() > 4
                 context['can_create_news'] = is_club_moderator(user, club)
+                context['can_edit_club'] = is_club_admin(user, club)
 
             pending = MembershipRequest.objects.filter(
                 user=user, 
@@ -119,5 +123,33 @@ class ClubCreateView(LoginRequiredMixin, CreateView):
         )
         return response
     
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+
+class ClubUpdateView(LoginRequiredMixin, UpdateView):
+    """Update club info - admin only."""
+    model = Club
+    form_class = ClubForm
+    template_name = 'clubs/club_edit.html'
+    context_object_name = 'club'
+    slug_url_kwarg = 'slug'
+
+    def get_object(self, queryset=None):
+        club = super().get_object(queryset)
+        if not is_club_admin(self.request.user, club):
+            raise PermissionDenied("You must be a club admin to edit this club.")
+        return club
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.setdefault('disable_name', True)
+        return kwargs
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Club "{self.object.name}" was updated successfully.')
+        return response
+
     def get_success_url(self):
         return self.object.get_absolute_url()

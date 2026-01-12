@@ -16,7 +16,7 @@ class ClubAdmin(admin.ModelAdmin):
             'fields': ('name', 'slug', 'description')
         }),
         ('Appearance', {
-            'fields': ('color', 'color_preview_large'),
+            'fields': ('color', 'color_preview_large', 'logo'),
         }),
         ('Metadata', {
             'fields': ('created_by', 'created_at'),

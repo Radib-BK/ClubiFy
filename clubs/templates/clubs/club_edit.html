@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ club.name }} - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-primary-700">Edit Club Info</h1>
+        <p class="text-gray-600 mt-2">Update the description, logo, or color palette for {{ club.name }}.</p>
+    </div>
+
+    <div class="card p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label class="label flex items-center gap-2">
+                    Club Name <span class="text-xs text-gray-500">(locked)</span>
+                </label>
+                {{ form.name }}
+                <p class="text-gray-500 text-sm mt-1">Club names stay unique to keep URLs consistent.</p>
+            </div>
+
+            <div>
+                <label for="id_description" class="label flex items-center gap-1">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_logo" class="label">
+                    Club Logo <span class="text-gray-400 text-sm font-normal">(optional)</span>
+                </label>
+                
+                {% if club.logo %}
+                <div class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex items-start justify-between mb-3">
+                        <p class="text-sm font-medium text-gray-700">Current Logo</p>
+                        <label for="id_logo-clear_id" class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="logo-clear" id="id_logo-clear_id" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2">
+                            <span class="text-xs text-red-600 group-hover:text-red-700 font-medium">Remove logo</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-24 h-24 bg-white rounded-xl shadow-sm border-2 border-gray-200 flex items-center justify-center overflow-hidden">
+                            <img src="{{ club.logo.url }}" alt="{{ club.name }} logo" class="w-full h-full object-cover p-2" id="current-logo-preview">
+                        </div>
+                        <div class="flex-1">
+                            {% with logo_name=club.logo.name|default:club.logo.url %}
+                            <p class="text-sm text-gray-700 font-medium mb-1 truncate" title="{{ logo_name }}">
+                                {{ logo_name|slice:"14:" }}
+                            </p>
+                            {% endwith %}
+                            <p class="text-xs text-gray-500 mb-2">Upload a new logo to replace the current one.</p>
+                            <p class="text-xs text-gray-500">Recommended: Square image (1:1 ratio) for best results.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="{% if club.logo %}mt-3{% endif %}">
+                    <label for="id_logo" class="relative block">
+                        <input type="file" name="logo" id="id_logo" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                        <div class="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer group">
+                            <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                <i class="fas fa-cloud-upload-alt text-primary-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-700 group-hover:text-primary-700">
+                                    <span id="file-label">{% if club.logo %}Choose a new logo{% else %}Choose a logo file{% endif %}</span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5 hidden" id="file-name"></p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md group-hover:border-primary-300 group-hover:text-primary-700">
+                                    Browse
+                                </span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                {% if form.logo.help_text %}
+                    <p class="text-gray-500 text-sm mt-2">{{ form.logo.help_text }}</p>
+                {% endif %}
+                {% if form.logo.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.logo.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <span class="label">
+                    Color Palette <span class="text-gray-400 text-sm font-normal">(optional)</span>
+                </span>
+                {% with selected_color=form.color.value|default:form.color.initial|default:club.color|default:'' %}
+                <div class="grid grid-cols-4 gap-3 mt-3 max-w-2xl">
+                    {% for value, label in form.color.field.choices %}
+                        <label for="edit-color-option-{{ forloop.counter }}" class="color-option flex flex-col items-center gap-2 p-2 rounded-lg border cursor-pointer transition shadow-sm w-full {% if selected_color == value|stringformat:"s" %}border-primary-500 ring-2 ring-primary-200 bg-primary-50{% else %}border-gray-200 hover:border-primary-200{% endif %}">
+                            <input type="radio"
+                                   name="{{ form.color.html_name }}"
+                                   id="edit-color-option-{{ forloop.counter }}"
+                                   value="{{ value }}"
+                                   class="sr-only color-radio"
+                                   {% if selected_color == value|stringformat:"s" %}checked{% endif %}
+                                   {% if not value %}data-random="true"{% endif %}>
+                            {% if value %}
+                                <span class="w-8 h-8 rounded-full border border-gray-200 shadow-inner" style="background-color: {{ value }};"></span>
+                                <span class="text-xs text-gray-600 text-center leading-tight">{{ value }}</span>
+                            {% else %}
+                                <span class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-[10px] text-gray-500 bg-gray-50">
+                                    Auto
+                                </span>
+                                <span class="text-xs text-gray-600 text-center leading-tight">Auto</span>
+                            {% endif %}
+                        </label>
+                    {% endfor %}
+                </div>
+                {% endwith %}
+                {% if form.color.help_text %}
+                    <p class="text-gray-500 text-sm mt-2">{{ form.color.help_text }}</p>
+                {% endif %}
+                {% if form.color.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.color.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="bg-red-100 text-red-800 rounded-lg p-3">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="flex items-center justify-between pt-4">
+                <a href="{{ club.get_absolute_url }}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Club</span>
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function handleFileSelect(input) {
+    const fileName = input.files[0]?.name || '';
+    const fileLabel = document.getElementById('file-label');
+    const fileNameDisplay = document.getElementById('file-name');
+    
+    if (fileName) {
+        fileLabel.textContent = 'Selected file:';
+        fileNameDisplay.textContent = fileName;
+        fileNameDisplay.classList.remove('hidden');
+    } else {
+        {% if club.logo %}
+        fileLabel.textContent = 'Choose a new logo';
+        {% else %}
+        fileLabel.textContent = 'Choose a logo file';
+        {% endif %}
+        fileNameDisplay.textContent = '';
+        fileNameDisplay.classList.add('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const colorRadios = document.querySelectorAll('.color-radio');
+    const colorOptions = document.querySelectorAll('.color-option');
+    
+    // Handle clear checkbox for logo
+    const clearCheckbox = document.getElementById('id_logo-clear_id');
+    const currentLogoPreview = document.getElementById('current-logo-preview');
+    const logoContainer = currentLogoPreview?.closest('.mb-4');
+    
+    if (clearCheckbox && logoContainer) {
+        clearCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                logoContainer.style.opacity = '0.5';
+                if (currentLogoPreview) {
+                    currentLogoPreview.style.filter = 'grayscale(100%)';
+                }
+            } else {
+                logoContainer.style.opacity = '1';
+                if (currentLogoPreview) {
+                    currentLogoPreview.style.filter = 'none';
+                }
+            }
+        });
+    }
+    
+    // Initialize selected state on page load
+    colorRadios.forEach(radio => {
+        if (radio.checked) {
+            const label = radio.closest('.color-option');
+            if (label) {
+                label.classList.remove('border-gray-200');
+                label.classList.add('border-primary-500', 'ring-2', 'ring-primary-200', 'bg-primary-50');
+            }
+        }
+        
+        radio.addEventListener('change', function() {
+            // Remove selected state from all options
+            colorOptions.forEach(option => {
+                option.classList.remove('border-primary-500', 'ring-2', 'ring-primary-200', 'bg-primary-50');
+                option.classList.add('border-gray-200');
+            });
+            
+            // Add selected state to the checked option's label
+            if (this.checked) {
+                const label = this.closest('.color-option');
+                if (label) {
+                    label.classList.remove('border-gray-200');
+                    label.classList.add('border-primary-500', 'ring-2', 'ring-primary-200', 'bg-primary-50');
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Ensure color palette grid displays correctly */
+.color-option {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.grid.grid-cols-4 {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+}
+
+@media (max-width: 640px) {
+    .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+</style>
+{% endblock %}
