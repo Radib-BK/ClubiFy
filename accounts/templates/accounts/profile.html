@@ -49,11 +49,14 @@
                 {% for membership in memberships %}
                 <a href="{{ membership.club.get_absolute_url }}" 
                    class="card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
-                         style="background-color: {{ membership.club.color }};">
-                        <span class="text-lg font-bold text-gray-900 drop-shadow">
+                   <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+                    {% if membership.club.logo %}
+                        <img src="{{ membership.club.logo.url }}" alt="{{ membership.club.name }} logo" class="w-full h-full object-cover p-1">
+                    {% else %}
+                        <span class="text-2xl font-bold text-primary-700">
                             {{ membership.club.name|slice:":1"|upper }}
                         </span>
+                    {% endif %}
                     </div>
                     <div class="flex-1">
                         <h3 class="font-medium text-gray-900">{{ membership.club.name }}</h3>
