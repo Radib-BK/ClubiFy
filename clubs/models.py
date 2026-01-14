@@ -4,19 +4,19 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 
 
-# Light pastel colors for club cards
+# Light pastel colors for club cards (slightly darker for better visibility)
 PASTEL_COLORS = [
-    '#FFE5E5',  # Light Pink
-    '#E5F0FF',  # Light Blue
-    '#E5FFE5',  # Light Green
-    '#FFF5E5',  # Light Orange
-    '#F5E5FF',  # Light Purple
-    '#E5FFFF',  # Light Cyan
-    '#FFFFE5',  # Light Yellow
-    '#FFE5F5',  # Light Magenta
-    '#E5FFF0',  # Light Mint
-    '#FFF0E5',  # Light Peach
-    '#E5F5FF',  # Light Sky
+    '#FFD4D4',  # Light Pink
+    '#D4E5FF',  # Light Blue
+    '#D4FFD4',  # Light Green
+    '#FFE8D4',  # Light Orange
+    '#E8D4FF',  # Light Purple
+    '#D4FFFF',  # Light Cyan
+    '#FFFFD4',  # Light Yellow
+    '#FFD4E8',  # Light Magenta
+    '#D4FFE8',  # Light Mint
+    '#FFE5D4',  # Light Peach
+    '#D4E8FF',  # Light Sky
 ]
 PASTEL_COLOR_CHOICES = [(color, color) for color in PASTEL_COLORS]
 
