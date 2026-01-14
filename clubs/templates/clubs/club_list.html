@@ -47,10 +47,14 @@
         <!-- Color Banner -->
         <div class="h-32 relative" style="background-color: {{ club.color }};">
             <div class="absolute bottom-4 left-4">
-                <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center">
+                <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+                {% if club.logo %}
+                    <img src="{{ club.logo.url }}" alt="{{ club.name }} logo" class="w-full h-full object-cover p-1">
+                {% else %}
                     <span class="text-2xl font-bold text-primary-700">
                         {{ club.name|slice:":1"|upper }}
                     </span>
+                {% endif %}
                 </div>
             </div>
         </div>
