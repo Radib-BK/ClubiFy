@@ -86,6 +86,8 @@
                 <div class="m-0 p-0">{{ post.body|markdown }}</div>
             </div>
         </div>
+        
+        {% include 'posts/partials/interaction_bar_expanded.html' with post=post club=club membership=membership is_liked=is_liked like_count=like_count comments=comments comment_count=comment_count %}
     </article>
 </div>
 {% if can_delete %}

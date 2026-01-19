@@ -10,7 +10,7 @@ from .models import Club
 from .forms import ClubForm
 from memberships.models import Membership, MembershipRequest, RequestStatus
 from memberships.helpers import is_club_moderator, is_club_admin
-from posts.models import Post, PostType
+from posts.models import Post, PostType, Like
 
 
 class ClubListView(ListView):
@@ -98,6 +98,19 @@ class ClubDetailView(DetailView):
         context['blog_total'] = blog_qs.count()
         context['news_posts'] = news_qs[:3]
         context['blog_posts'] = blog_qs[:3]
+        
+        # Get user's liked post IDs for the displayed posts
+        user_liked_post_ids = set()
+        if user.is_authenticated:
+            all_displayed_posts = list(context['news_posts']) + list(context['blog_posts'])
+            if all_displayed_posts:
+                user_liked_post_ids = set(
+                    Like.objects.filter(
+                        user=user,
+                        post__in=all_displayed_posts
+                    ).values_list('post_id', flat=True)
+                )
+        context['user_liked_post_ids'] = user_liked_post_ids
         
         pending_requests_count = MembershipRequest.objects.filter(
             club=club,

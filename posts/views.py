@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 from clubs.models import Club
 from memberships.decorators import club_member_required
 from memberships.helpers import get_membership, is_club_moderator
-from .models import Post, PostType
+from .models import Post, PostType, Like, Comment
 from .forms import BlogPostForm, NewsPostForm
 from .utils.summarizer import summarize_text
 
@@ -17,11 +19,19 @@ def post_detail(request, slug, post_id):
     membership = get_membership(request.user, club)
     can_delete = membership and membership.role in ['admin', 'moderator']
     
+    # Like/comment data
+    is_liked = post.is_liked_by(request.user)
+    comments = post.comments.select_related('user').all()
+    
     return render(request, 'posts/post_detail.html', {
         'club': club,
         'post': post,
         'membership': membership,
         'can_delete': can_delete,
+        'is_liked': is_liked,
+        'like_count': post.like_count,
+        'comments': comments,
+        'comment_count': post.comment_count,
     })
 
 
@@ -36,12 +46,23 @@ def news_list(request, slug):
         post_type=PostType.NEWS,
         is_published=True,
     ).order_by('-created_at')
+    
+    # Get user's liked post IDs for efficient template rendering
+    user_liked_post_ids = set()
+    if request.user.is_authenticated:
+        user_liked_post_ids = set(
+            Like.objects.filter(
+                user=request.user,
+                post__in=news_posts
+            ).values_list('post_id', flat=True)
+        )
 
     return render(request, 'posts/post_list.html', {
         'club': club,
         'posts': news_posts,
         'list_type': 'news',
         'membership': membership,
+        'user_liked_post_ids': user_liked_post_ids,
     })
 
 
@@ -56,12 +77,23 @@ def blog_list(request, slug):
         post_type=PostType.BLOG,
         is_published=True,
     ).order_by('-created_at')
+    
+    # Get user's liked post IDs for efficient template rendering
+    user_liked_post_ids = set()
+    if request.user.is_authenticated:
+        user_liked_post_ids = set(
+            Like.objects.filter(
+                user=request.user,
+                post__in=blog_posts
+            ).values_list('post_id', flat=True)
+        )
 
     return render(request, 'posts/post_list.html', {
         'club': club,
         'posts': blog_posts,
         'list_type': 'blog',
         'membership': membership,
+        'user_liked_post_ids': user_liked_post_ids,
     })
 
 
@@ -272,3 +304,93 @@ def summarize_post(request, slug, post_id):
             'is_fallback': True,
             'error': f'Error during summarization: {str(e)}',
         })
+
+
+@require_http_methods(["POST"])
+@club_member_required
+def toggle_like(request, slug, post_id):
+    """Toggle like on a post - members only. Returns HTML fragment for HTMX."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    
+    # Check if user already liked
+    existing_like = Like.objects.filter(post=post, user=request.user).first()
+    
+    if existing_like:
+        existing_like.delete()
+        is_liked = False
+    else:
+        Like.objects.create(post=post, user=request.user)
+        is_liked = True
+    
+    # Return updated like button partial
+    return render(request, 'posts/partials/like_button.html', {
+        'post': post,
+        'club': club,
+        'is_liked': is_liked,
+        'like_count': post.like_count,
+    })
+
+
+@require_http_methods(["POST"])
+@club_member_required
+def add_comment(request, slug, post_id):
+    """Add a comment to a post - members only. Returns HTML fragment for HTMX."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    
+    body = request.POST.get('body', '').strip()
+    
+    if not body:
+        messages.error(request, 'Comment cannot be empty.')
+        return render(request, 'posts/partials/comment_form.html', {
+            'post': post,
+            'club': club,
+            'error': 'Comment cannot be empty.',
+        })
+    
+    comment = Comment.objects.create(
+        post=post,
+        user=request.user,
+        body=body
+    )
+    
+    # Return the new comment and updated form
+    return render(request, 'posts/partials/comment_added.html', {
+        'post': post,
+        'club': club,
+        'comment': comment,
+        'membership': get_membership(request.user, club),
+    })
+
+
+@require_http_methods(["POST"])
+@club_member_required
+def delete_comment(request, slug, post_id, comment_id):
+    """Delete a comment - only comment author or moderators/admins can delete."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    comment = get_object_or_404(Comment, id=comment_id, post=post)
+    membership = get_membership(request.user, club)
+    
+    # Check permission: comment author or moderator/admin
+    can_delete = (
+        comment.user == request.user or 
+        (membership and membership.role in ['admin', 'moderator'])
+    )
+    
+    if not can_delete:
+        return render(request, 'posts/partials/comment_item.html', {
+            'comment': comment,
+            'club': club,
+            'post': post,
+            'membership': membership,
+            'error': 'You do not have permission to delete this comment.',
+        })
+    
+    comment.delete()
+    
+    # Return empty response (comment will be removed from DOM)
+    return render(request, 'posts/partials/comment_deleted.html', {
+        'post': post,
+    })

@@ -67,3 +67,14 @@ def markdown_to_text(text):
     
     return text
 
+
+@register.filter(name='in_set')
+def in_set(value, collection):
+    """
+    Check if a value is in a collection (list, set, tuple).
+    Usage: {{ post.id|in_set:user_liked_post_ids }}
+    """
+    if collection is None:
+        return False
+    return value in collection
+

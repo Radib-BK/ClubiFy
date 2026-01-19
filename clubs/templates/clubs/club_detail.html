@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load markdown_extras %}
+{% load static %}
 
 {% block title %}{{ club.name }} - ClubiFy{% endblock %}
 
@@ -79,14 +80,18 @@
                 {% if news_posts %}
                     <div class="space-y-4">
                         {% for post in news_posts %}
-                        <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" 
-                           class="block border-l-4 border-primary-500 pl-4 py-2 hover:bg-gray-50 transition-colors">
-                            <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
-                            <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
-                            <p class="text-xs text-gray-400 mt-2">
-                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
-                            </p>
-                        </a>
+                        <div class="border-l-4 border-primary-500 pl-4 py-2 hover:bg-gray-50 transition-colors">
+                            <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" class="block">
+                                <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
+                                <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
+                                <p class="text-xs text-gray-400 mt-2">
+                                    By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
+                                </p>
+                            </a>
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                {% include 'posts/partials/interaction_bar_mini.html' with post=post club=club membership=membership is_liked=post.id|in_set:user_liked_post_ids %}
+                            </div>
+                        </div>
                         {% endfor %}
                     </div>
                     {% if is_member and news_total > 3 %}
@@ -120,14 +125,18 @@
                 {% if blog_posts %}
                     <div class="space-y-4">
                         {% for post in blog_posts %}
-                        <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" 
-                           class="block border-b border-gray-100 pb-4 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors -mx-2 px-2 rounded">
-                            <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
-                            <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
-                            <p class="text-xs text-gray-400 mt-2">
-                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
-                            </p>
-                        </a>
+                        <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors -mx-2 px-2 rounded">
+                            <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" class="block">
+                                <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
+                                <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
+                                <p class="text-xs text-gray-400 mt-2">
+                                    By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
+                                </p>
+                            </a>
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                {% include 'posts/partials/interaction_bar_mini.html' with post=post club=club membership=membership is_liked=post.id|in_set:user_liked_post_ids %}
+                            </div>
+                        </div>
                         {% endfor %}
                     </div>
                     {% if is_member and blog_total > 3 %}

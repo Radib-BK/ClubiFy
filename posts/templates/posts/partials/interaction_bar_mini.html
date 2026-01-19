@@ -1,0 +1,56 @@
+{% comment %}
+Minimized interaction bar for post list views
+Shows like count, comment count, and share button
+Context: post, club, membership (optional), is_liked (optional)
+{% endcomment %}
+<div class="flex items-center gap-1 sm:gap-2" onclick="event.stopPropagation(); event.preventDefault();">
+    {% if membership %}
+    <!-- Like button for members -->
+    <div id="like-btn-{{ post.id }}">
+        {% include 'posts/partials/like_button.html' with post=post club=club is_liked=is_liked like_count=post.like_count %}
+    </div>
+    {% else %}
+    <!-- Like count display for guests -->
+    <span class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 hover:text-rose-500 hover:bg-rose-50 text-sm transition-all duration-300 cursor-default">
+        <i class="far fa-heart text-lg group-hover:scale-110 transition-transform duration-300"></i>
+        <span class="font-semibold">{{ post.like_count }}</span>
+    </span>
+    {% endif %}
+    
+    <!-- Comment count (links to post detail) -->
+    <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}#comments" 
+       class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-primary-50 text-sm transition-all duration-300"
+       onclick="event.stopPropagation();">
+        <i class="far fa-comment text-lg group-hover:scale-110 transition-transform duration-300"></i>
+        <span class="font-semibold">{{ post.comment_count }}</span>
+    </a>
+    
+    <!-- Share button -->
+    <button 
+        type="button"
+        onclick="event.stopPropagation(); sharePost{{ post.id }}(this);"
+        class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 text-sm transition-all duration-300"
+        title="Share">
+        <i class="fas fa-share text-lg group-hover:scale-110 transition-transform duration-300"></i>
+    </button>
+</div>
+
+<script>
+function sharePost{{ post.id }}(button) {
+    const url = '{{ request.scheme }}://{{ request.get_host }}{% url "posts:post_detail" slug=club.slug post_id=post.id %}';
+    navigator.clipboard.writeText(url).then(function() {
+        const icon = button.querySelector('i');
+        icon.className = 'fas fa-check text-lg';
+        button.classList.add('text-emerald-600', 'bg-emerald-50');
+        button.classList.remove('text-gray-500');
+        
+        setTimeout(function() {
+            icon.className = 'fas fa-share text-lg group-hover:scale-110 transition-transform duration-300';
+            button.classList.remove('text-emerald-600', 'bg-emerald-50');
+            button.classList.add('text-gray-500');
+        }, 2000);
+    }).catch(function(err) {
+        prompt('Copy this link:', url);
+    });
+}
+</script>

@@ -79,6 +79,11 @@
                         </span>
                     </div>
                 </a>
+                
+                <!-- Interaction bar (like, comment, share) -->
+                <div class="pt-3 mt-3 border-t border-gray-100">
+                    {% include 'posts/partials/interaction_bar_mini.html' with post=post club=club membership=membership is_liked=post.id|in_set:user_liked_post_ids %}
+                </div>
             </article>
             {% endfor %}
         </div>

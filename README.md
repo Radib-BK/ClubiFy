@@ -24,6 +24,7 @@
 - Membership requests with approve / reject workflow
 - Publish blog posts (members) and news posts (mods / admins)
 - Delete posts (mods/admins) and remove members (admins)
+- **Like, Comment & Share** on posts
 - AI post summarizer
 - User profiles with memberships and pending requests
 - Responsive UI with Tailwind CSS

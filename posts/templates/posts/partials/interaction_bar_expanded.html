@@ -1,0 +1,198 @@
+{% comment %}
+Expanded interaction bar for post detail view
+Shows like button, comment count, share button, and full comments section
+Context: post, club, membership (optional), is_liked (optional), like_count, comments, comment_count
+{% endcomment %}
+
+<!-- Engagement Stats Bar -->
+<div class="mt-8 pt-6 border-t border-gray-100">
+    <!-- Action buttons row - Social media style -->
+    <div class="flex items-center justify-between py-3 px-2 bg-gray-50 rounded-xl mb-6">
+        <div class="flex items-center gap-1 sm:gap-4">
+            {% if membership %}
+            <!-- Like button for members -->
+            <div id="like-btn-{{ post.id }}">
+                {% include 'posts/partials/like_button.html' with post=post club=club is_liked=is_liked like_count=like_count %}
+            </div>
+            {% else %}
+            <!-- Like count display for guests -->
+            <div class="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-gray-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 cursor-default">
+                <i class="far fa-heart text-xl group-hover:scale-110 transition-transform duration-300"></i>
+                <span class="font-semibold">{{ like_count }}</span>
+                <span class="hidden sm:inline text-gray-400 text-sm group-hover:text-rose-400">like{{ like_count|pluralize }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Comment count indicator -->
+            <a href="#comments" class="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-300">
+                <i class="far fa-comment text-xl group-hover:scale-110 transition-transform duration-300"></i>
+                <span class="font-semibold">{{ comment_count }}</span>
+                <span class="hidden sm:inline text-gray-400 text-sm group-hover:text-primary-500">comment{{ comment_count|pluralize }}</span>
+            </a>
+        </div>
+        
+        <!-- Share button -->
+        <button 
+            type="button"
+            onclick="sharePostExpanded(this);"
+            class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow"
+            title="Share this post">
+            <i class="fas fa-share text-base group-hover:scale-110 transition-transform duration-300"></i>
+            <span>Share</span>
+        </button>
+    </div>
+    
+    <!-- Comments section -->
+    <div id="comments" class="scroll-mt-24">
+        <!-- Comments header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-500 shadow-lg">
+                <i class="fas fa-comments text-white"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900">Comments</h3>
+                <p class="text-sm text-gray-500">{{ comment_count }} comment{{ comment_count|pluralize }} on this post</p>
+            </div>
+        </div>
+        
+        {% if membership %}
+        <!-- Comment form for members -->
+        <div class="mb-8">
+            {% include 'posts/partials/comment_form.html' with post=post club=club %}
+        </div>
+        {% else %}
+        <!-- Login prompt for guests -->
+        <div class="mb-8 p-6 bg-primary-50 rounded-2xl border border-primary-100 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-white shadow-lg flex items-center justify-center">
+                <i class="fas fa-user-plus text-2xl text-primary-500"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Join the conversation!</h4>
+            <p class="text-gray-600 text-sm mb-4">Become a member of this club to share your thoughts</p>
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}" 
+               class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white text-sm font-semibold rounded-full hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                <i class="fas fa-sign-in-alt"></i>
+                Login to Comment
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- Comments list -->
+        <div id="comments-section" class="space-y-1">
+            {% if comments %}
+                {% for comment in comments %}
+                    {% include 'posts/partials/comment_item.html' with comment=comment club=club post=post membership=membership %}
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                        <i class="far fa-comment-dots text-3xl text-gray-400"></i>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">No comments yet</h4>
+                    <p class="text-gray-500 text-sm">Be the first to share your thoughts!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Comment Modal -->
+{% if membership %}
+<div id="deleteCommentModal" class="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-2xl max-w-md w-full border border-gray-200">
+        <div class="p-4 sm:p-6">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-trash-alt text-red-600 text-sm sm:text-base"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900">Delete Comment</h3>
+                    <p class="text-xs sm:text-sm text-gray-500">This action cannot be undone</p>
+                </div>
+            </div>
+            <p class="text-sm sm:text-base text-gray-700 mb-6">
+                Are you sure you want to delete the comment by <span id="commentAuthor" class="font-semibold"></span>?
+            </p>
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
+                <button 
+                    type="button"
+                    onclick="closeDeleteCommentModal()"
+                    class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button 
+                    type="button"
+                    id="confirmDeleteCommentBtn"
+                    onclick="confirmDeleteComment()"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete Comment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Scripts -->
+<script>
+// Share functionality
+function sharePostExpanded(button) {
+    const url = '{{ request.scheme }}://{{ request.get_host }}{% url "posts:post_detail" slug=club.slug post_id=post.id %}';
+    navigator.clipboard.writeText(url).then(function() {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check text-base"></i><span>Copied!</span>';
+        button.classList.add('border-emerald-400', 'text-emerald-600', 'bg-emerald-50');
+        button.classList.remove('border-gray-200', 'text-gray-600');
+        
+        setTimeout(function() {
+            button.innerHTML = originalHTML;
+            button.classList.remove('border-emerald-400', 'text-emerald-600', 'bg-emerald-50');
+            button.classList.add('border-gray-200', 'text-gray-600');
+        }, 2500);
+    }).catch(function(err) {
+        prompt('Copy this link:', url);
+    });
+}
+
+// Delete comment modal functionality
+let currentCommentId = null;
+
+function openDeleteCommentModal(commentId, authorName) {
+    currentCommentId = commentId;
+    document.getElementById('commentAuthor').textContent = authorName;
+    document.getElementById('deleteCommentModal').classList.remove('hidden');
+    document.getElementById('deleteCommentModal').classList.add('flex');
+    document.body.classList.add('modal-open');
+}
+
+function closeDeleteCommentModal() {
+    currentCommentId = null;
+    document.getElementById('deleteCommentModal').classList.add('hidden');
+    document.getElementById('deleteCommentModal').classList.remove('flex');
+    document.body.classList.remove('modal-open');
+}
+
+function confirmDeleteComment() {
+    if (currentCommentId) {
+        // Trigger HTMX request to delete the comment
+        const commentElement = document.getElementById('comment-' + currentCommentId);
+        if (commentElement) {
+            htmx.ajax('POST', '{% url "posts:delete_comment" slug=club.slug post_id=post.id comment_id=0 %}'.replace('/0/', '/' + currentCommentId + '/'), {
+                target: '#comment-' + currentCommentId,
+                swap: 'outerHTML',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+        }
+        closeDeleteCommentModal();
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('deleteCommentModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteCommentModal();
+    }
+});
+</script>

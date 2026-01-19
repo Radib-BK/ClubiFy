@@ -1,0 +1,14 @@
+{% comment %}
+Like button partial - used for HTMX updates
+Context: post, club, is_liked, like_count
+{% endcomment %}
+<button 
+    type="button"
+    hx-post="{% url 'posts:toggle_like' slug=club.slug post_id=post.id %}"
+    hx-swap="outerHTML"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-out hover:bg-rose-50 {% if is_liked %}text-rose-600{% else %}text-gray-500 hover:text-rose-500{% endif %}"
+    title="{% if is_liked %}Unlike{% else %}Like{% endif %}">
+    <i class="{% if is_liked %}fas{% else %}far{% endif %} fa-heart text-lg transition-transform duration-300 group-hover:scale-110"></i>
+    <span class="font-semibold">{{ like_count }}</span>
+</button>

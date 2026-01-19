@@ -1,0 +1,5 @@
+{% comment %}
+HTMX response when a comment is added successfully
+Context: comment, club, post, membership
+{% endcomment %}
+{% include 'posts/partials/comment_item.html' with comment=comment club=club post=post membership=membership %}
