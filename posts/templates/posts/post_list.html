@@ -106,7 +106,7 @@
                     Be the first to write a blog post!
                 {% endif %}
             </p>
-            {% if membership %}
+            {% if membership and can_create_news or membership and list_type == 'blog' %}
                 <a href="{% url 'posts:create_post' slug=club.slug %}{% if list_type == 'news' %}?type=news{% endif %}" 
                    class="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors shadow-sm">
                     <i class="fas fa-plus"></i>

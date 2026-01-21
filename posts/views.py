@@ -40,6 +40,7 @@ def news_list(request, slug):
     """List all news posts for a club - members only."""
     club = get_object_or_404(Club, slug=slug)
     membership = get_membership(request.user, club)
+    can_create_news = is_club_moderator(request.user, club)
 
     news_posts = Post.objects.filter(
         club=club,
@@ -62,6 +63,7 @@ def news_list(request, slug):
         'posts': news_posts,
         'list_type': 'news',
         'membership': membership,
+        'can_create_news': can_create_news,
         'user_liked_post_ids': user_liked_post_ids,
     })
 
@@ -71,6 +73,7 @@ def blog_list(request, slug):
     """List all blog posts for a club - members only."""
     club = get_object_or_404(Club, slug=slug)
     membership = get_membership(request.user, club)
+    can_create_news = is_club_moderator(request.user, club)
 
     blog_posts = Post.objects.filter(
         club=club,
@@ -93,6 +96,7 @@ def blog_list(request, slug):
         'posts': blog_posts,
         'list_type': 'blog',
         'membership': membership,
+        'can_create_news': can_create_news,
         'user_liked_post_ids': user_liked_post_ids,
     })
 
