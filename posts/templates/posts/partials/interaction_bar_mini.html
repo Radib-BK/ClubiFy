@@ -28,29 +28,9 @@ Context: post, club, membership (optional), is_liked (optional)
     <!-- Share button -->
     <button 
         type="button"
-        onclick="event.stopPropagation(); sharePost{{ post.id }}(this);"
-        class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 text-sm transition-all duration-300"
+        onclick="event.stopPropagation(); openShareModal('{{ post.id }}', '{{ post.title|escapejs }}', '{{ request.scheme }}://{{ request.get_host }}{% url "posts:post_detail" slug=club.slug post_id=post.id %}');"
+        class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 text-sm transition-all duration-300"
         title="Share">
-        <i class="fas fa-share text-lg group-hover:scale-110 transition-transform duration-300"></i>
+        <i class="fas fa-share-nodes text-lg group-hover:scale-110 transition-transform duration-300"></i>
     </button>
 </div>
-
-<script>
-function sharePost{{ post.id }}(button) {
-    const url = '{{ request.scheme }}://{{ request.get_host }}{% url "posts:post_detail" slug=club.slug post_id=post.id %}';
-    navigator.clipboard.writeText(url).then(function() {
-        const icon = button.querySelector('i');
-        icon.className = 'fas fa-check text-lg';
-        button.classList.add('text-emerald-600', 'bg-emerald-50');
-        button.classList.remove('text-gray-500');
-        
-        setTimeout(function() {
-            icon.className = 'fas fa-share text-lg group-hover:scale-110 transition-transform duration-300';
-            button.classList.remove('text-emerald-600', 'bg-emerald-50');
-            button.classList.add('text-gray-500');
-        }, 2000);
-    }).catch(function(err) {
-        prompt('Copy this link:', url);
-    });
-}
-</script>
