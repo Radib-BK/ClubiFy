@@ -6,7 +6,7 @@ Context: post, club, error (optional)
     hx-post="{% url 'posts:add_comment' slug=club.slug post_id=post.id %}"
     hx-target="#comments-section"
     hx-swap="beforeend"
-    hx-on::after-request="this.reset(); this.querySelector('textarea').style.height = 'auto';"
+    hx-on::after-request="this.reset(); this.querySelector('textarea').style.height = 'auto'; if (event.detail.successful) { var el = document.getElementById('comments-empty-state'); if (el) el.remove(); }"
     class="relative">
     {% csrf_token %}
     
