@@ -52,17 +52,22 @@
 
 ### Getting Started
 
-| Register | Browse Clubs |
-|:--------:|:------------:|
-| ![Registration](screenshots/registration.png) | ![Club List](screenshots/club-list.png) |
-| Create your account to join clubs | Discover and explore available clubs |
+| Browse Clubs |
+|:------------:|
+| ![Club List](screenshots/club-list.png) |
+| Discover and explore available clubs |
+
+| Register | Create Club |
+|:--------:|:-----------:|
+| ![Registration](screenshots/registration.png) | ![Create Club](screenshots/create-club.png) |
+| Create your account to join clubs | Start your own community |
 
 ### Club Management
 
-| Create Club | Club Details |
-|:-----------:|:------------:|
-| ![Create Club](screenshots/create-club.png) | ![Club Details](screenshots/club-details.png) |
-| Start your own community | View club info, news & blogs |
+| Club Details |
+|:------------:|
+| ![Club Details](screenshots/club-details.png) |
+| View club info, news & blogs |
 
 | Member Management |
 |:-----------------:|
