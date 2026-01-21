@@ -8,6 +8,28 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+# List line: starts with * - + (optional leading space) or 1. 2. etc.
+_LIST_LINE_RE = re.compile(r'^\s*([\*\+-]\s|\d+\.\s)')
+
+
+def _ensure_blank_before_lists(text):
+    """
+    Insert a blank line before a list when the previous line is non-blank and
+    not itself a list. Markdown requires a blank line before block-level lists
+    when they follow a paragraph (e.g. "Test:\n* item" does not parse as a list).
+    """
+    if not text:
+        return text
+    lines = text.split('\n')
+    result = []
+    for i, line in enumerate(lines):
+        if i > 0 and _LIST_LINE_RE.match(line):
+            prev = lines[i - 1]
+            if prev.strip() and not _LIST_LINE_RE.match(prev):
+                result.append('')
+        result.append(line)
+    return '\n'.join(result)
+
 
 @register.filter(name='markdown')
 def markdown_filter(text):
@@ -17,6 +39,8 @@ def markdown_filter(text):
     """
     if not text:
         return ''
+    
+    text = _ensure_blank_before_lists(str(text))
     
     md = markdown.Markdown(
         extensions=[
