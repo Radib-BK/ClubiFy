@@ -29,7 +29,7 @@ Context: post, club, membership (optional), is_liked (optional)
     <button 
         type="button"
         onclick="event.stopPropagation(); openShareModal('{{ post.id }}', '{{ post.title|escapejs }}', '{{ request.scheme }}://{{ request.get_host }}{% url "posts:post_detail" slug=club.slug post_id=post.id %}');"
-        class="group inline-flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 text-sm transition-all duration-300"
+        class="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 text-sm transition-all duration-300"
         title="Share">
         <i class="fas fa-share-nodes text-lg group-hover:scale-110 transition-transform duration-300"></i>
     </button>
