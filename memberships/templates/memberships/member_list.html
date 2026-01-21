@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load account_tags %}
 
 {% block title %}Members - {{ club.name }} - ClubiFy{% endblock %}
 
@@ -42,6 +43,10 @@
         <div class="p-4 sm:p-5 hover:bg-gray-50 transition-colors">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                    {% with profile_pic=member.user|profile_picture %}
+                    {% if profile_pic %}
+                    <img src="{{ profile_pic }}" alt="{{ member.user.username }}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0">
+                    {% else %}
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0
                         {% if member.role == 'admin' %}bg-primary-100
                         {% elif member.role == 'moderator' %}bg-purple-100
@@ -53,6 +58,8 @@
                             {{ member.user.username|slice:":1"|upper }}
                         </span>
                     </div>
+                    {% endif %}
+                    {% endwith %}
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-0.5 sm:mb-1">
                             <p class="text-sm sm:text-base font-semibold text-gray-900 truncate">

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load markdown_extras %}
+{% load account_tags %}
 
 {% block title %}{{ post.title }} - {{ club.name }} - ClubiFy{% endblock %}
 
@@ -76,11 +77,17 @@
 
         <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 pb-3 sm:pb-4 border-b border-gray-100 mb-3 sm:mb-4">
             <div class="flex items-center gap-2">
+                {% with profile_pic=post.author|profile_picture %}
+                {% if profile_pic %}
+                <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0">
+                {% else %}
                 <div class="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <span class="text-primary-700 font-medium text-xs sm:text-sm">
                         {{ post.author.username|slice:":1"|upper }}
                     </span>
                 </div>
+                {% endif %}
+                {% endwith %}
                 <span class="truncate max-w-[120px] sm:max-w-none">{{ post.author.username }}</span>
             </div>
             <span class="hidden sm:inline">·</span>

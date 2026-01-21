@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load account_tags %}
 
 {% block title %}My Profile - ClubiFy{% endblock %}
 
@@ -7,11 +8,17 @@
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-center gap-4">
+            {% with profile_pic=user|profile_picture %}
+            {% if profile_pic %}
+            <img src="{{ profile_pic }}" alt="{{ user.username }}" class="w-16 h-16 rounded-full object-cover">
+            {% else %}
             <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
                 <span class="text-2xl font-bold text-primary-700">
                     {{ user.username|slice:":1"|upper }}
                 </span>
             </div>
+            {% endif %}
+            {% endwith %}
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">{{ user.username }}</h1>
                 <p class="text-gray-600">{{ user.email }}</p>
@@ -51,7 +58,7 @@
                    class="card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
                    <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
                     {% if membership.club.logo %}
-                        <img src="{{ membership.club.logo.url }}" alt="{{ membership.club.name }} logo" class="w-full h-full object-cover p-1">
+                        <img src="{{ membership.club.logo.url }}" alt="{{ membership.club.name }} logo" class="w-full h-full rounded-xl object-cover p-1">
                     {% else %}
                         <span class="text-2xl font-bold text-primary-700">
                             {{ membership.club.name|slice:":1"|upper }}
@@ -89,11 +96,14 @@
             <div class="space-y-3">
                 {% for req in pending_requests %}
                 <div class="card p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
-                         style="background-color: {{ req.club.color }};">
-                        <span class="text-lg font-bold text-white drop-shadow">
-                            {{ req.club.name|slice:":1"|upper }}
-                        </span>
+                    <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+                        {% if req.club.logo %}
+                            <img src="{{ req.club.logo.url }}" alt="{{ req.club.name }} logo" class="w-full h-full rounded-xl object-cover p-1">
+                        {% else %}
+                            <span class="text-2xl font-bold text-primary-700">
+                                {{ req.club.name|slice:":1"|upper }}
+                            </span>
+                        {% endif %}
                     </div>
                     <div class="flex-1">
                         <h3 class="font-medium text-gray-900">{{ req.club.name }}</h3>

@@ -8,6 +8,7 @@ from clubs.views import ClubListView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+    path('accounts/', include('allauth.urls')),  # Social auth URLs
     path('', ClubListView.as_view(), name='home'),
     path('clubs/', include('clubs.urls')),
     path('', include('memberships.urls')),

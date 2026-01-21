@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load markdown_extras %}
+{% load account_tags %}
 
 {% block title %}
 {% if list_type == 'news' %}All News - {{ club.name }} - ClubiFy{% else %}All Blog Posts - {{ club.name }} - ClubiFy{% endif %}
@@ -63,11 +64,17 @@
 
                     <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
                         <div class="flex items-center gap-2">
+                            {% with profile_pic=post.author|profile_picture %}
+                            {% if profile_pic %}
+                            <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                            {% else %}
                             <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary-500">
                                 <span class="text-white font-semibold text-xs">
                                     {{ post.author.username|slice:":1"|upper }}
                                 </span>
                             </div>
+                            {% endif %}
+                            {% endwith %}
                             <span class="text-sm text-gray-700 font-medium">{{ post.author.username }}</span>
                         </div>
                         <span class="text-gray-400">·</span>

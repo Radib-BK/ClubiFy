@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load markdown_extras %}
 {% load static %}
+{% load account_tags %}
 
 {% block title %}{{ club.name }} - ClubiFy{% endblock %}
 
@@ -200,9 +201,15 @@
                     {% if display_members %}
                         <div class="flex items-center gap-2 flex-wrap">
                             {% for membership in display_members %}
+                                {% with profile_pic=membership.user|profile_picture %}
+                                {% if profile_pic %}
+                                <img src="{{ profile_pic }}" alt="{{ membership.user.username }}" class="w-10 h-10 rounded-full object-cover shadow-sm hover:shadow-md transition-shadow cursor-pointer" title="{{ membership.user.username }}">
+                                {% else %}
                                 <div class="w-10 h-10 rounded-full text-white flex items-center justify-center font-semibold text-sm shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-primary-500" title="{{ membership.user.username }}">
                                     {{ membership.user.username|slice:":1"|upper }}
                                 </div>
+                                {% endif %}
+                                {% endwith %}
                             {% endfor %}
                             {% if has_more_members %}
                                 <div class="w-10 h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold text-sm shadow-sm cursor-pointer" title="{{ member_count }} total members">

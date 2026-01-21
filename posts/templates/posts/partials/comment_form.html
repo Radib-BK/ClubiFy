@@ -2,6 +2,7 @@
 Comment form partial - for adding new comments
 Context: post, club, error (optional)
 {% endcomment %}
+{% load account_tags %}
 <form 
     hx-post="{% url 'posts:add_comment' slug=club.slug post_id=post.id %}"
     hx-target="#comments-section"
@@ -13,11 +14,17 @@ Context: post, club, error (optional)
     <div class="flex gap-3 sm:gap-4">
         <!-- User avatar -->
         <div class="flex-shrink-0">
+            {% with profile_pic=user|profile_picture %}
+            {% if profile_pic %}
+            <img src="{{ profile_pic }}" alt="{{ user.username }}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover shadow-md ring-2 ring-primary-100">
+            {% else %}
             <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center shadow-md ring-2 ring-primary-100">
                 <span class="font-bold text-sm sm:text-base">
                     {{ user.username|slice:":1"|upper }}
                 </span>
             </div>
+            {% endif %}
+            {% endwith %}
         </div>
         
         <!-- Input area -->
