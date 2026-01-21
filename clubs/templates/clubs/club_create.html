@@ -53,6 +53,19 @@
             </div>
 
             <div>
+                <label for="id_banner" class="label">
+                    Banner Image <span class="text-gray-400 text-sm font-normal">(optional)</span>
+                </label>
+                {{ form.banner }}
+                {% if form.banner.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.banner.help_text }}</p>
+                {% endif %}
+                {% if form.banner.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.banner.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
                 <span class="label">
                     Color Palette <span class="text-gray-400 text-sm font-normal">(optional)</span>
                 </span>

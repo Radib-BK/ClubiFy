@@ -29,7 +29,8 @@ class Club(models.Model):
     slug = models.SlugField(max_length=110, unique=True, blank=True)
     description = models.TextField()
     color = models.CharField(max_length=7, blank=True, help_text="Card background color (auto-generated)")
-    logo = models.ImageField(upload_to='club_logos/', blank=True, null=True)
+    logo = models.FileField(upload_to='club_logos/', blank=True, null=True)
+    banner = models.FileField(upload_to='club_banners/', blank=True, null=True, help_text="Optional banner image for the club")
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

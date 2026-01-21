@@ -1,7 +1,12 @@
 from django import forms
 from django.forms import ClearableFileInput
+from django.core.validators import FileExtensionValidator
 
 from .models import Club, PASTEL_COLORS
+
+
+# Allowed image extensions including SVG
+ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
 
 
 class ClubForm(forms.ModelForm):
@@ -13,13 +18,23 @@ class ClubForm(forms.ModelForm):
         }),
         help_text='Pick a pastel color for the club card or leave blank for random.'
     )
-    logo = forms.ImageField(
+    logo = forms.FileField(
         required=False,
+        validators=[FileExtensionValidator(allowed_extensions=ALLOWED_IMAGE_EXTENSIONS)],
         widget=ClearableFileInput(attrs={
             'class': 'input',
-            'accept': 'image/*'
+            'accept': 'image/*,.svg'
         }),
-        help_text='Upload a square logo for best results (optional).'
+        help_text='Upload a square logo (PNG, JPG, SVG supported).'
+    )
+    banner = forms.FileField(
+        required=False,
+        validators=[FileExtensionValidator(allowed_extensions=ALLOWED_IMAGE_EXTENSIONS)],
+        widget=ClearableFileInput(attrs={
+            'class': 'input',
+            'accept': 'image/*,.svg'
+        }),
+        help_text='Recommended size: 1200 x 300 pixels. PNG, JPG, SVG supported.'
     )
 
     def __init__(self, *args, **kwargs):
@@ -38,7 +53,7 @@ class ClubForm(forms.ModelForm):
 
     class Meta:
         model = Club
-        fields = ['name', 'description', 'logo', 'color']
+        fields = ['name', 'description', 'logo', 'banner', 'color']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'input',

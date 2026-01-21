@@ -93,6 +93,56 @@
             </div>
 
             <div>
+                <label for="id_banner" class="label">
+                    Banner Image <span class="text-gray-400 text-sm font-normal">(optional)</span>
+                </label>
+                
+                {% if club.banner %}
+                <div class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex items-start justify-between mb-3">
+                        <p class="text-sm font-medium text-gray-700">Current Banner</p>
+                        <label for="id_banner-clear_id" class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="banner-clear" id="id_banner-clear_id" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2">
+                            <span class="text-xs text-red-600 group-hover:text-red-700 font-medium">Remove banner</span>
+                        </label>
+                    </div>
+                    <div class="rounded-lg overflow-hidden border border-gray-200">
+                        <img src="{{ club.banner.url }}" alt="{{ club.name }} banner" class="w-full h-32 object-cover" id="current-banner-preview">
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="{% if club.banner %}mt-3{% endif %}">
+                    <label for="id_banner" class="relative block">
+                        <input type="file" name="banner" id="id_banner" accept="image/*" class="hidden" onchange="handleBannerSelect(this)">
+                        <div class="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer group">
+                            <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                <i class="fas fa-image text-primary-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-700 group-hover:text-primary-700">
+                                    <span id="banner-file-label">{% if club.banner %}Choose a new banner{% else %}Choose a banner image{% endif %}</span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5 hidden" id="banner-file-name"></p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md group-hover:border-primary-300 group-hover:text-primary-700">
+                                    Browse
+                                </span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                {% if form.banner.help_text %}
+                    <p class="text-gray-500 text-sm mt-2">{{ form.banner.help_text }}</p>
+                {% endif %}
+                {% if form.banner.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.banner.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
                 <span class="label">
                     Color Palette <span class="text-gray-400 text-sm font-normal">(optional)</span>
                 </span>
@@ -170,6 +220,26 @@ function handleFileSelect(input) {
     }
 }
 
+function handleBannerSelect(input) {
+    const fileName = input.files[0]?.name || '';
+    const fileLabel = document.getElementById('banner-file-label');
+    const fileNameDisplay = document.getElementById('banner-file-name');
+    
+    if (fileName) {
+        fileLabel.textContent = 'Selected file:';
+        fileNameDisplay.textContent = fileName;
+        fileNameDisplay.classList.remove('hidden');
+    } else {
+        {% if club.banner %}
+        fileLabel.textContent = 'Choose a new banner';
+        {% else %}
+        fileLabel.textContent = 'Choose a banner image';
+        {% endif %}
+        fileNameDisplay.textContent = '';
+        fileNameDisplay.classList.add('hidden');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const colorRadios = document.querySelectorAll('.color-radio');
     const colorOptions = document.querySelectorAll('.color-option');
@@ -190,6 +260,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 logoContainer.style.opacity = '1';
                 if (currentLogoPreview) {
                     currentLogoPreview.style.filter = 'none';
+                }
+            }
+        });
+    }
+    
+    // Handle clear checkbox for banner
+    const bannerClearCheckbox = document.getElementById('id_banner-clear_id');
+    const currentBannerPreview = document.getElementById('current-banner-preview');
+    const bannerContainer = currentBannerPreview?.closest('.mb-4');
+    
+    if (bannerClearCheckbox && bannerContainer) {
+        bannerClearCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                bannerContainer.style.opacity = '0.5';
+                if (currentBannerPreview) {
+                    currentBannerPreview.style.filter = 'grayscale(100%)';
+                }
+            } else {
+                bannerContainer.style.opacity = '1';
+                if (currentBannerPreview) {
+                    currentBannerPreview.style.filter = 'none';
                 }
             }
         });

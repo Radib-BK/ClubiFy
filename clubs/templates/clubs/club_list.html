@@ -44,9 +44,14 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for club in clubs %}
     <a href="{{ club.get_absolute_url }}" class="card hover:shadow-lg transition-shadow duration-200 group flex flex-col">
-        <!-- Color Banner -->
-        <div class="h-32 relative" style="background-color: {{ club.color }};">
-            <div class="absolute bottom-4 left-4">
+        <!-- Color Banner / Banner Image -->
+        <div class="h-32 relative">
+            <div class="absolute inset-0 rounded-t-lg overflow-hidden" {% if not club.banner %}style="background-color: {{ club.color }};"{% endif %}>
+                {% if club.banner %}
+                <img src="{{ club.banner.url }}" alt="{{ club.name }} banner" class="w-full h-full object-cover">
+                {% endif %}
+            </div>
+            <div class="absolute bottom-4 left-4 z-10">
                 <div class="w-14 h-14 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden">
                 {% if club.logo %}
                     <img src="{{ club.logo.url }}" alt="{{ club.name }} logo" class="w-full h-full rounded-xl object-cover p-1">
