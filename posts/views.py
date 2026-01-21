@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_control
 
 from clubs.models import Club
 from memberships.decorators import club_member_required
@@ -398,3 +399,148 @@ def delete_comment(request, slug, post_id, comment_id):
     return render(request, 'posts/partials/comment_deleted.html', {
         'post': post,
     })
+
+
+@cache_control(max_age=86400)  # Cache for 24 hours
+def post_og_image(request, slug, post_id):
+    """Generate Open Graph image for social media sharing.
+    
+    Creates a 1200x630 image with:
+    - Club's pastel color as background
+    - Club logo (or first letter) centered
+    - Post title and club name as text
+    """
+    from PIL import Image, ImageDraw, ImageFont
+    from io import BytesIO
+    import os
+    from django.conf import settings
+    
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    
+    # OG image dimensions (Facebook/Twitter recommended)
+    width, height = 1200, 630
+    
+    # Parse club color and create a lighter/pastel version
+    club_color = club.color or '#6366F1'  # Default to indigo
+    if club_color.startswith('#'):
+        hex_color = club_color[1:]
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+    else:
+        r, g, b = 99, 102, 241  # Default indigo
+    
+    # Create pastel version by mixing with white
+    pastel_r = int(r + (255 - r) * 0.6)
+    pastel_g = int(g + (255 - g) * 0.6)
+    pastel_b = int(b + (255 - b) * 0.6)
+    bg_color = (pastel_r, pastel_g, pastel_b)
+    
+    # Darker version for text
+    dark_r = int(r * 0.7)
+    dark_g = int(g * 0.7)
+    dark_b = int(b * 0.7)
+    text_color = (dark_r, dark_g, dark_b)
+    
+    # Create image
+    img = Image.new('RGB', (width, height), bg_color)
+    draw = ImageDraw.Draw(img)
+    
+    # Try to load fonts (use default if not available)
+    try:
+        # Try system fonts
+        font_paths = [
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf',
+            '/System/Library/Fonts/Helvetica.ttc',
+            'C:\\Windows\\Fonts\\arial.ttf',
+        ]
+        title_font = None
+        for font_path in font_paths:
+            if os.path.exists(font_path):
+                title_font = ImageFont.truetype(font_path, 48)
+                subtitle_font = ImageFont.truetype(font_path, 28)
+                logo_font = ImageFont.truetype(font_path, 120)
+                break
+        if not title_font:
+            title_font = ImageFont.load_default()
+            subtitle_font = title_font
+            logo_font = title_font
+    except Exception:
+        title_font = ImageFont.load_default()
+        subtitle_font = title_font
+        logo_font = title_font
+    
+    # Draw club logo or letter in center
+    center_x, center_y = width // 2, height // 2 - 40
+    
+    if club.logo:
+        try:
+            logo_path = club.logo.path
+            logo_img = Image.open(logo_path)
+            # Resize logo to fit
+            logo_size = 180
+            logo_img = logo_img.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
+            # Convert to RGBA if needed
+            if logo_img.mode != 'RGBA':
+                logo_img = logo_img.convert('RGBA')
+            # Create circular mask
+            mask = Image.new('L', (logo_size, logo_size), 0)
+            mask_draw = ImageDraw.Draw(mask)
+            mask_draw.ellipse((0, 0, logo_size, logo_size), fill=255)
+            # Paste logo with white background circle
+            circle_bg = Image.new('RGBA', (logo_size, logo_size), (255, 255, 255, 255))
+            img.paste(circle_bg, (center_x - logo_size // 2, center_y - logo_size // 2 - 30), mask)
+            img.paste(logo_img, (center_x - logo_size // 2, center_y - logo_size // 2 - 30), mask)
+        except Exception:
+            # Fall back to letter logo
+            _draw_letter_logo(draw, center_x, center_y - 30, club.name[0].upper(), logo_font, (r, g, b))
+    else:
+        # Draw letter logo
+        _draw_letter_logo(draw, center_x, center_y - 30, club.name[0].upper(), logo_font, (r, g, b))
+    
+    # Draw post title (centered, below logo)
+    title = post.title
+    if len(title) > 60:
+        title = title[:57] + '...'
+    
+    # Get text bounding box for centering
+    title_bbox = draw.textbbox((0, 0), title, font=title_font)
+    title_width = title_bbox[2] - title_bbox[0]
+    title_x = (width - title_width) // 2
+    title_y = center_y + 100
+    draw.text((title_x, title_y), title, fill=text_color, font=title_font)
+    
+    # Draw club name and ClubiFy branding
+    subtitle = f"{club.name} • ClubiFy"
+    subtitle_bbox = draw.textbbox((0, 0), subtitle, font=subtitle_font)
+    subtitle_width = subtitle_bbox[2] - subtitle_bbox[0]
+    subtitle_x = (width - subtitle_width) // 2
+    subtitle_y = title_y + 60
+    draw.text((subtitle_x, subtitle_y), subtitle, fill=(100, 100, 100), font=subtitle_font)
+    
+    # Save to bytes
+    buffer = BytesIO()
+    img.save(buffer, format='PNG', optimize=True)
+    buffer.seek(0)
+    
+    return HttpResponse(buffer.getvalue(), content_type='image/png')
+
+
+def _draw_letter_logo(draw, center_x, center_y, letter, font, color):
+    """Helper to draw a circular letter logo."""
+    # Draw white circle background
+    circle_radius = 90
+    draw.ellipse(
+        (center_x - circle_radius, center_y - circle_radius,
+         center_x + circle_radius, center_y + circle_radius),
+        fill=(255, 255, 255)
+    )
+    # Draw letter
+    letter_bbox = draw.textbbox((0, 0), letter, font=font)
+    letter_width = letter_bbox[2] - letter_bbox[0]
+    letter_height = letter_bbox[3] - letter_bbox[1]
+    letter_x = center_x - letter_width // 2
+    letter_y = center_y - letter_height // 2 - 10
+    draw.text((letter_x, letter_y), letter, fill=color, font=font)

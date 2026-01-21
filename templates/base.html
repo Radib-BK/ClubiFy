@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ClubiFy{% endblock %}</title>
     
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}ClubiFy - Club Management Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Discover clubs, manage memberships, and share posts with your community.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:site_name" content="ClubiFy">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}ClubiFy - Club Management Platform{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Discover clubs, manage memberships, and share posts with your community.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{% endblock %}">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{% static 'Images/clubify_logo.svg' %}">
     <link rel="alternate icon" href="{% static 'Images/clubify_logo.svg' %}">

@@ -6,6 +6,7 @@ app_name = 'posts'
 urlpatterns = [
     path('clubs/<slug:slug>/posts/new/', views.create_post, name='create_post'),
     path('clubs/<slug:slug>/posts/<int:post_id>/', views.post_detail, name='post_detail'),
+    path('clubs/<slug:slug>/posts/<int:post_id>/og-image/', views.post_og_image, name='post_og_image'),
     path('clubs/<slug:slug>/posts/<int:post_id>/summarize/', views.summarize_post, name='summarize_post'),
     path('clubs/<slug:slug>/posts/<int:post_id>/delete/', views.delete_post, name='delete_post'),
     path('clubs/<slug:slug>/posts/<int:post_id>/like/', views.toggle_like, name='toggle_like'),

@@ -3,6 +3,16 @@
 
 {% block title %}{{ post.title }} - {{ club.name }} - ClubiFy{% endblock %}
 
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.body|markdown_to_text|truncatewords:30 }}{% endblock %}
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% url 'posts:post_og_image' slug=club.slug post_id=post.id %}{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{% url 'posts:post_detail' slug=club.slug post_id=post.id %}{% endblock %}
+
+{% block twitter_title %}{{ post.title }}{% endblock %}
+{% block twitter_description %}{{ post.body|markdown_to_text|truncatewords:30 }}{% endblock %}
+{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% url 'posts:post_og_image' slug=club.slug post_id=post.id %}{% endblock %}
+
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6">
     <div class="mb-4 sm:mb-6">
