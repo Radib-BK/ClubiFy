@@ -59,10 +59,15 @@
 
 ### Club Management
 
-| Create Club | Club Details | Member Management |
-|:-----------:|:------------:|:-----------------:|
-| ![Create Club](screenshots/create-club.png) | ![Club Details](screenshots/club-details.png) | ![Club Members](screenshots/club-members.png) |
-| Start your own community | View club info, news & blogs | Manage members and roles |
+| Create Club | Club Details |
+|:-----------:|:------------:|
+| ![Create Club](screenshots/create-club.png) | ![Club Details](screenshots/club-details.png) |
+| Start your own community | View club info, news & blogs |
+
+| Member Management |
+|:-----------------:|
+| ![Club Members](screenshots/club-members.png) |
+| Manage members and roles |
 
 ### Content & Interaction
 
@@ -71,17 +76,27 @@
 | ![Create Post](screenshots/create-post.png) | ![All Posts](screenshots/all-posts.png) |
 | Write blog posts or news updates | View all posts in a club |
 
-| Post Details | Comments | Share |
-|:------------:|:--------:|:-----:|
-| ![Post Details](screenshots/post-details.png) | ![Comments](screenshots/comment-section.png) | ![Share Modal](screenshots/share-modal.png) |
-| Read full post content | Engage with the community | Share to social media |
+| Post Details |
+|:------------:|
+| ![Post Details](screenshots/post-details.png) |
+| Read full post content |
+
+| Comments | Share |
+|:--------:|:-----:|
+| ![Comments](screenshots/comment-section.png) | ![Share Modal](screenshots/share-modal.png) |
+| Engage with the community | Share to social media |
 
 ### Features
 
-| AI Summarizer | User Profile |
-|:-------------:|:------------:|
-| ![AI Summarize](screenshots/ai-summarize.png) | ![Profile](screenshots/profile.png) |
-| Get AI-powered post summaries | View your memberships & activity |
+| AI Summarizer |
+|:-------------:|
+| ![AI Summarize](screenshots/ai-summarize.png) |
+| Get AI-powered post summaries |
+
+| User Profile |
+|:------------:|
+| ![Profile](screenshots/profile.png) |
+| View your memberships & activity |
 
 
 
