@@ -48,34 +48,40 @@
 
 ---
 
-## Screenshots (User Flow)
+## Screenshots
 
-1) Discover clubs  
-![Club List](screenshots/club-list.png)
+### Getting Started
 
-2) Learn about a club  
-![Club Details](screenshots/club-details.png)
+| Register | Browse Clubs |
+|:--------:|:------------:|
+| ![Registration](screenshots/registration.png) | ![Club List](screenshots/club-list.png) |
+| Create your account to join clubs | Discover and explore available clubs |
 
-3) Join and manage members  
-![Club Members](screenshots/club-members.png)
+### Club Management
 
-4) Register and get started  
-![Registration](screenshots/registration.png)
+| Create Club | Club Details | Member Management |
+|:-----------:|:------------:|:-----------------:|
+| ![Create Club](screenshots/create-club.png) | ![Club Details](screenshots/club-details.png) | ![Club Members](screenshots/club-members.png) |
+| Start your own community | View club info, news & blogs | Manage members and roles |
 
-5) Create a new club  
-![Create Club](screenshots/create-club.png)
+### Content & Interaction
 
-6) Browse posts inside a club  
-![All Posts](screenshots/all-posts.png)
+| Create Post | Browse Posts |
+|:-----------:|:------------:|
+| ![Create Post](screenshots/create-post.png) | ![All Posts](screenshots/all-posts.png) |
+| Write blog posts or news updates | View all posts in a club |
 
-7) Read a post and interact  
-![Post Details](screenshots/post-details.png)
+| Post Details | Comments | Share |
+|:------------:|:--------:|:-----:|
+| ![Post Details](screenshots/post-details.png) | ![Comments](screenshots/comment-section.png) | ![Share Modal](screenshots/share-modal.png) |
+| Read full post content | Engage with the community | Share to social media |
 
-8) Summarize with AI  
-![AI Summarize](screenshots/ai-summarize.png)
+### Features
 
-9) Your profile at a glance  
-![Profile](screenshots/profile.png)
+| AI Summarizer | User Profile |
+|:-------------:|:------------:|
+| ![AI Summarize](screenshots/ai-summarize.png) | ![Profile](screenshots/profile.png) |
+| Get AI-powered post summaries | View your memberships & activity |
 
 
 
