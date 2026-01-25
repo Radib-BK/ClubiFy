@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Post - {{ club.name }} - ClubiFy{% endblock %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto overflow-x-hidden">
+    <div class="mb-6 sm:mb-8">
+        <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Post</span>
+        </a>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-3 sm:mt-4 flex items-center gap-2 sm:gap-3">
+            {% if can_create_news %}
+                <span>Edit Post</span>
+            {% else %}
+                <i class="fas fa-blog text-primary-600"></i>
+                <span>Edit Blog Post</span>
+            {% endif %}
+        </h1>
+        <p class="text-gray-600 mt-1 text-sm sm:text-base">
+            {% if can_create_news %}
+                Update your post content below.
+            {% else %}
+                Update your blog post content.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="card p-4 sm:p-6 md:p-8">
+        <form method="post" class="space-y-4 sm:space-y-6">
+            {% csrf_token %}
+            
+            {% if can_create_news %}
+            <div>
+                <label for="id_post_type" class="label">Post Type</label>
+                {{ form.post_type }}
+                {% if form.post_type.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.post_type.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div>
+                <label for="id_title" class="label">Title</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.title.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_body" class="label">Content</label>
+                {{ form.body }}
+                <div id="toastui-editor-container" class="border border-gray-300 rounded-lg overflow-hidden focus-within:border-primary-500"></div>
+                {% if form.body.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.body.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="bg-red-100 text-red-800 rounded-lg p-3">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="flex flex-row items-center justify-between gap-3 pt-3 sm:pt-4">
+                <a href="{% url 'posts:post_detail' slug=club.slug post_id=post.id %}" class="text-gray-600 hover:text-gray-900">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary whitespace-nowrap">
+                    Update Post
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="mt-4 sm:mt-6 p-3 sm:p-4 bg-slate-50 border border-blue-100 rounded-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-600 text-sm sm:text-base"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs sm:text-sm text-gray-700">
+                    <span class="font-semibold">WYSIWYG editor:</span> Edit your content like Microsoft Word with the toolbar.
+                </p>    
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script src="{% static 'js/toastui-editor-init.js' %}"></script>
+{% endblock %}

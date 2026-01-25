@@ -19,6 +19,7 @@ def post_detail(request, slug, post_id):
     post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
     membership = get_membership(request.user, club)
     can_delete = membership and membership.role in ['admin', 'moderator']
+    can_edit = request.user.is_authenticated and post.author == request.user
     
     # Like/comment data
     is_liked = post.is_liked_by(request.user)
@@ -29,6 +30,7 @@ def post_detail(request, slug, post_id):
         'post': post,
         'membership': membership,
         'can_delete': can_delete,
+        'can_edit': can_edit,
         'is_liked': is_liked,
         'like_count': post.like_count,
         'comments': comments,
@@ -207,6 +209,86 @@ def create_post(request, slug):
     return render(request, 'posts/post_create.html', {
         'form': form,
         'club': club,
+        'membership': membership,
+        'can_create_news': can_create_news,
+    })
+
+
+@club_member_required
+def edit_post(request, slug, post_id):
+    """Edit a post - only the post creator can edit."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    membership = get_membership(request.user, club)
+    
+    # Check if user is the post author
+    if post.author != request.user:
+        messages.error(request, 'You do not have permission to edit this post. Only the post creator can edit posts.')
+        return redirect('posts:post_detail', slug=slug, post_id=post_id)
+    
+    can_create_news = is_club_moderator(request.user, club)
+    FormClass = NewsPostForm if can_create_news else BlogPostForm
+    
+    if request.method == 'POST':
+        can_create_news_now = is_club_moderator(request.user, club)
+        raw_post_type = request.POST.get('post_type', '').strip()
+        
+        # If trying to change to News but not allowed, prevent it
+        if raw_post_type == PostType.NEWS and not can_create_news_now:
+            messages.error(
+                request, 
+                'You do not have permission to change this post to News. Only moderators and admins can create News posts.'
+            )
+            FormClassNow = NewsPostForm if can_create_news_now else BlogPostForm
+            form = FormClassNow(request.POST, instance=post)
+            return render(request, 'posts/post_edit.html', {
+                'form': form,
+                'club': club,
+                'post': post,
+                'membership': membership,
+                'can_create_news': can_create_news_now,
+            })
+        
+        FormClassNow = NewsPostForm if can_create_news_now else BlogPostForm
+        form = FormClassNow(request.POST, instance=post)
+        
+        if form.is_valid():
+            updated_post = form.save(commit=False)
+            
+            # Prevent changing post type to News if not allowed
+            if updated_post.post_type == PostType.NEWS and not can_create_news_now:
+                messages.error(
+                    request, 
+                    'You do not have permission to change this post to News. Only moderators and admins can create News posts.'
+                )
+                form = FormClassNow(request.POST, instance=post)
+                return render(request, 'posts/post_edit.html', {
+                    'form': form,
+                    'club': club,
+                    'post': post,
+                    'membership': membership,
+                    'can_create_news': can_create_news_now,
+                })
+            
+            # If user can't create news, ensure post type remains Blog
+            if not can_create_news_now:
+                updated_post.post_type = PostType.BLOG
+            
+            # Keep the original author and club
+            updated_post.author = post.author
+            updated_post.club = club
+            updated_post.save()
+            
+            post_type_display = 'News' if updated_post.is_news else 'Blog'
+            messages.success(request, f'{post_type_display} post "{updated_post.title}" updated successfully!')
+            return redirect('posts:post_detail', slug=slug, post_id=post_id)
+    else:
+        form = FormClass(instance=post)
+    
+    return render(request, 'posts/post_edit.html', {
+        'form': form,
+        'club': club,
+        'post': post,
         'membership': membership,
         'can_create_news': can_create_news,
     })
