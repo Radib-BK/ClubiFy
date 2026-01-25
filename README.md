@@ -18,7 +18,7 @@
 
 
 ## Highlights
-- Authentication (signup, login, logout)
+- Authentication with Google OAuth (signup, login, logout)
 - Create and browse clubs
 - Role-based memberships (Admin, Moderator, Member)
 - Membership requests with approve / reject workflow
@@ -158,6 +158,8 @@ DB_USER=postgres
 DB_PASSWORD=your-password
 DB_HOST=localhost
 DB_PORT=5432
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
 #### 5. Create PostgreSQL database
