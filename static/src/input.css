@@ -257,6 +257,134 @@
   margin-bottom: 2em;
 }
 
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  font-size: 0.875em;
+}
+
+.prose table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.prose table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #111827;
+  border-right: 1px solid #e5e7eb;
+}
+
+.prose table th:last-child {
+  border-right: none;
+}
+
+.prose table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.prose table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.prose table td {
+  padding: 0.75rem 1rem;
+  border-right: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.prose table td:last-child {
+  border-right: none;
+}
+
+.prose table tbody tr:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 640px) {
+  .prose table {
+    font-size: 0.75rem;
+  }
+  
+  .prose table th,
+  .prose table td {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Toast UI Editor styles */
+#id_body {
+  display: none !important;
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.toastui-editor-popup,
+.toastui-editor-popup-add-link,
+.toastui-editor-popup-add-image,
+div[class*="toastui-editor-popup"] {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.toastui-editor-popup-body {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.toastui-editor-popup-body input,
+.toastui-editor-popup-body textarea {
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.toastui-editor-popup-body label,
+.toastui-editor-popup-body span,
+.toastui-editor-popup-body p {
+  color: #111827;
+}
+
+@media (max-width: 640px) {
+  .toastui-editor-popup,
+  .toastui-editor-popup-add-link,
+  .toastui-editor-popup-add-image,
+  div[class*="toastui-editor-popup"] {
+    position: fixed;
+    left: 0.5rem;
+    right: 0.5rem;
+    width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+    margin: 0;
+    transform: none;
+    z-index: 10000;
+  }
+  
+  .toastui-editor-popup-body {
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .toastui-editor-popup-body input,
+  .toastui-editor-popup-body textarea {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .toastui-editor-popup-body button {
+    max-width: 48%;
+  }
+}
+
 .modal-open {
   overflow: hidden;
 }
