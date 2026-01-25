@@ -1167,6 +1167,12 @@
   .whitespace-pre-wrap {
     white-space: pre-wrap;
   }
+  .text-\[\#FF6B2E\] {
+    color: #FF6B2E;
+  }
+  .text-\[\#FF8040\] {
+    color: #FF8040;
+  }
   .text-blue-600 {
     color: var(--color-blue-600);
   }
