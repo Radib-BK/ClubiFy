@@ -84,27 +84,42 @@
 
         <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{{ post.title }}</h1>
 
-        <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 pb-3 sm:pb-4 border-b border-gray-100 mb-3 sm:mb-4">
-            <div class="flex items-center gap-2">
-                {% with profile_pic=post.author|profile_picture %}
-                {% if profile_pic %}
-                <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0">
-                {% else %}
-                <div class="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="text-primary-700 font-medium text-xs sm:text-sm">
-                        {{ post.author.username|slice:":1"|upper }}
-                    </span>
+        <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 pb-3 sm:pb-4 border-b border-gray-100 mb-3 sm:mb-4">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-2">
+                    {% with profile_pic=post.author|profile_picture %}
+                    {% if profile_pic %}
+                    <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0">
+                    {% else %}
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-primary-700 font-medium text-xs sm:text-sm">
+                            {{ post.author.username|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    <span class="truncate max-w-[120px] sm:max-w-none">{{ post.author.username }}</span>
                 </div>
-                {% endif %}
-                {% endwith %}
-                <span class="truncate max-w-[120px] sm:max-w-none">{{ post.author.username }}</span>
+                <span class="hidden sm:inline">·</span>
+                <span class="flex-shrink-0">{{ post.created_at|date:"M j, Y" }}</span>
+                <span class="hidden sm:inline">·</span>
+                <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-primary-600 hover:underline truncate max-w-[150px] sm:max-w-none">
+                    {{ club.name }}
+                </a>
             </div>
-            <span class="hidden sm:inline">·</span>
-            <span class="flex-shrink-0">{{ post.created_at|date:"M j, Y" }}</span>
-            <span class="hidden sm:inline">·</span>
-            <a href="{% url 'clubs:club_detail' slug=club.slug %}" class="text-primary-600 hover:underline truncate max-w-[150px] sm:max-w-none">
-                {{ club.name }}
-            </a>
+            
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'posts:toggle_bookmark' slug=club.slug post_id=post.id %}" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium {% if is_bookmarked %}text-amber-900 bg-amber-100 border border-amber-300 shadow-sm{% else %}text-slate-600 bg-slate-50 border border-slate-400 hover:bg-slate-50{% endif %} rounded-md transition-colors"
+                        title="{% if is_bookmarked %}Remove bookmark{% else %}Bookmark this post{% endif %}"
+                        aria-pressed="{% if is_bookmarked %}true{% else %}false{% endif %}">
+                    <i class="{% if is_bookmarked %}fas fa-bookmark{% else %}far fa-bookmark{% endif %}"></i>
+                    <span class="inline">Bookmark</span>
+                </button>
+            </form>
+            {% endif %}
         </div>
 
         <div id="post-content-wrapper">
@@ -212,4 +227,3 @@ document.addEventListener('keydown', function(e) {
 </script>
 {% endif %}
 {% endblock %}
-

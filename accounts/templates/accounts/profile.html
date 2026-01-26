@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load account_tags %}
+{% load markdown_extras %}
 
 {% block title %}My Profile - ClubiFy{% endblock %}
 
@@ -120,6 +121,57 @@
                 <p>No pending requests</p>
                 <p class="text-sm mt-1">Your membership requests will appear here</p>
             </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bookmarked Posts -->
+    <div class="mt-8">
+        <div class="card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-bookmark text-primary-600"></i> Bookmarked Posts
+                </h2>
+                {% if bookmark_total > 0 %}
+                    <a href="{% url 'posts:bookmark_list' %}" 
+                       class="text-xs text-primary-600 hover:underline">
+                        View all ({{ bookmark_total }})
+                    </a>
+                {% endif %}
+            </div>
+            {% if bookmarked_posts %}
+                <div class="space-y-4">
+                    {% for post in bookmarked_posts %}
+                    <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors -mx-2 px-2 rounded">
+                        <a href="{% url 'posts:post_detail' slug=post.club.slug post_id=post.id %}" class="block">
+                            <h3 class="font-medium text-gray-900 hover:text-primary-600">{{ post.title }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">{{ post.body|markdown_to_text|truncatewords:30 }}</p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }} · <span class="inline-flex items-center gap-1 text-primary-600">Read more <i class="fas fa-arrow-right text-[10px]"></i></span>
+                            </p>
+                        </a>
+                        <div class="mt-2 pt-2 border-t border-gray-100">
+                            <a href="{% url 'clubs:club_detail' slug=post.club.slug %}" class="text-xs text-primary-600 hover:text-primary-700">
+                                {{ post.club.name }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if bookmark_total > 4 %}
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <a href="{% url 'posts:bookmark_list' %}" 
+                       class="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
+                        <span>View more</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <p>No bookmarked posts yet.</p>
+                    <p class="text-sm mt-1">Bookmark posts to save them for later!</p>
+                </div>
             {% endif %}
         </div>
     </div>

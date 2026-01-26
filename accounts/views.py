@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 
 from .forms import SignUpForm, LoginForm
 from memberships.models import Membership, MembershipRequest, RequestStatus
+from posts.models import Bookmark
 
 
 class SignUpView(CreateView):
@@ -64,9 +65,18 @@ def profile(request):
     admin_count = memberships.filter(role='admin').count()
     post_count = user.posts.count()
     
+    # Get bookmarked posts (latest 4)
+    bookmarks = Bookmark.objects.filter(
+        user=user
+    ).select_related('post', 'post__author', 'post__club').order_by('-created_at')[:4]
+    bookmarked_posts = [bookmark.post for bookmark in bookmarks]
+    bookmark_total = Bookmark.objects.filter(user=user).count()
+    
     return render(request, 'accounts/profile.html', {
         'memberships': memberships,
         'pending_requests': pending_requests,
         'admin_count': admin_count,
         'post_count': post_count,
+        'bookmarked_posts': bookmarked_posts,
+        'bookmark_total': bookmark_total,
     })

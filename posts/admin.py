@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Like, Comment
+from .models import Post, Like, Comment, Bookmark
 
 
 @admin.register(Post)
@@ -51,4 +51,13 @@ class CommentAdmin(admin.ModelAdmin):
     def body_preview(self, obj):
         return obj.body[:50] + '...' if len(obj.body) > 50 else obj.body
     body_preview.short_description = 'Comment'
+
+
+@admin.register(Bookmark)
+class BookmarkAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'post__title')
+    raw_id_fields = ('user', 'post')
+    readonly_fields = ('created_at',)
 

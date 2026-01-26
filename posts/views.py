@@ -8,7 +8,7 @@ from django.views.decorators.cache import cache_control
 from clubs.models import Club
 from memberships.decorators import club_member_required
 from memberships.helpers import get_membership, is_club_moderator
-from .models import Post, PostType, Like, Comment
+from .models import Post, PostType, Like, Comment, Bookmark
 from .forms import BlogPostForm, NewsPostForm
 from .utils.summarizer import summarize_text
 
@@ -21,8 +21,11 @@ def post_detail(request, slug, post_id):
     can_delete = membership and membership.role in ['admin', 'moderator']
     can_edit = request.user.is_authenticated and post.author == request.user
     
-    # Like/comment data
+    # Like/comment/bookmark data
     is_liked = post.is_liked_by(request.user)
+    is_bookmarked = False
+    if request.user.is_authenticated:
+        is_bookmarked = Bookmark.objects.filter(post=post, user=request.user).exists()
     comments = post.comments.select_related('user').all()
     
     return render(request, 'posts/post_detail.html', {
@@ -32,6 +35,7 @@ def post_detail(request, slug, post_id):
         'can_delete': can_delete,
         'can_edit': can_edit,
         'is_liked': is_liked,
+        'is_bookmarked': is_bookmarked,
         'like_count': post.like_count,
         'comments': comments,
         'comment_count': post.comment_count,
@@ -420,6 +424,28 @@ def toggle_like(request, slug, post_id):
 
 
 @require_http_methods(["POST"])
+@login_required
+def toggle_bookmark(request, slug, post_id):
+    """Toggle bookmark on a post - authenticated users only."""
+    club = get_object_or_404(Club, slug=slug)
+    post = get_object_or_404(Post, id=post_id, club=club, is_published=True)
+    
+    # Check if user already bookmarked
+    existing_bookmark = Bookmark.objects.filter(post=post, user=request.user).first()
+    
+    if existing_bookmark:
+        existing_bookmark.delete()
+        is_bookmarked = False
+        messages.success(request, 'Post removed from bookmarks.')
+    else:
+        Bookmark.objects.create(post=post, user=request.user)
+        is_bookmarked = True
+        messages.success(request, 'Post bookmarked!')
+    
+    return redirect('posts:post_detail', slug=slug, post_id=post_id)
+
+
+@require_http_methods(["POST"])
 @club_member_required
 def add_comment(request, slug, post_id):
     """Add a comment to a post - members only. Returns HTML fragment for HTMX."""
@@ -480,6 +506,21 @@ def delete_comment(request, slug, post_id, comment_id):
     # Return empty response (comment will be removed from DOM)
     return render(request, 'posts/partials/comment_deleted.html', {
         'post': post,
+    })
+
+
+@login_required
+def bookmark_list(request):
+    """Display all bookmarked posts for the current user."""
+    bookmarks = Bookmark.objects.filter(
+        user=request.user
+    ).select_related('post', 'post__author', 'post__club').order_by('-created_at')
+    
+    bookmarked_posts = [bookmark.post for bookmark in bookmarks]
+    
+    return render(request, 'posts/bookmark_list.html', {
+        'bookmarked_posts': bookmarked_posts,
+        'bookmark_count': len(bookmarked_posts),
     })
 
 

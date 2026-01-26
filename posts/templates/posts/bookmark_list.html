@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load markdown_extras %}
+{% load account_tags %}
+
+{% block title %}My Bookmarks - ClubiFy{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="mb-6">
+        <a href="{% url 'accounts:profile' %}" class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium text-sm bg-white px-3 py-1.5 rounded-md border border-gray-200 shadow-sm hover:border-primary-300 transition">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Profile</span>
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+            <i class="fas fa-bookmark text-primary-600 text-xl"></i>
+            <h1 class="text-3xl font-bold text-gray-900">My Bookmarks</h1>
+        </div>
+        <p class="text-gray-500 text-sm">
+            {{ bookmark_count }} bookmarked post{{ bookmark_count|pluralize }}
+        </p>
+    </div>
+
+    {% if bookmarked_posts %}
+        <div class="space-y-6">
+            {% for post in bookmarked_posts %}
+            <article class="card p-6 hover:shadow-lg transition-all duration-200 border border-gray-100 group">
+                <a href="{% url 'posts:post_detail' slug=post.club.slug post_id=post.id %}" class="block">
+                    <div class="mb-4">
+                        {% if post.is_news %}
+                            <span class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-100 text-primary-700 rounded-full text-xs sm:text-sm font-medium">
+                                <i class="fas fa-bullhorn text-xs"></i>
+                                <span>News</span>
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100 text-purple-700 rounded-full text-xs sm:text-sm font-medium">
+                                <i class="fas fa-blog text-xs"></i>
+                                <span>Blog</span>
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <h2 class="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors mb-3">
+                        {{ post.title }}
+                    </h2>
+
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                        {{ post.body|markdown_to_text|truncatewords:40 }}
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
+                        <div class="flex items-center gap-2">
+                            {% with profile_pic=post.author|profile_picture %}
+                            {% if profile_pic %}
+                            <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary-500">
+                                <span class="text-white font-semibold text-xs">
+                                    {{ post.author.username|slice:":1"|upper }}
+                                </span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                            <span class="text-sm text-gray-700 font-medium">{{ post.author.username }}</span>
+                        </div>
+                        <span class="text-gray-400">·</span>
+                        <span class="text-sm text-gray-500">{{ post.created_at|date:"M j, Y" }}</span>
+                        <span class="text-gray-400">·</span>
+                        <a href="{% url 'clubs:club_detail' slug=post.club.slug %}" class="text-sm text-primary-600 group-hover:text-primary-700 font-medium flex items-center gap-1">
+                            {{ post.club.name }}
+                            <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card p-12 text-center">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center bg-primary-50">
+                <i class="fas fa-bookmark text-primary-600 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No bookmarked posts yet</h3>
+            <p class="text-gray-500 mb-6">
+                Start bookmarking posts to save them for later reading!
+            </p>
+            <a href="{% url 'clubs:club_list' %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors shadow-sm">
+                <i class="fas fa-compass"></i>
+                <span>Browse Clubs</span>
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

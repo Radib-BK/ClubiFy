@@ -117,3 +117,28 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.user.username} on {self.post.title}: {self.body[:50]}..."
 
+
+class Bookmark(models.Model):
+    """
+    Represents a bookmark on a post.
+    Each user can only bookmark a post once.
+    """
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='bookmarks'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='post_bookmarks'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['post', 'user']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} bookmarked {self.post.title}"
+
