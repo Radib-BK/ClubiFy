@@ -30,10 +30,17 @@ def get_hf_summarizer(model_name=None):
             # Double-check pattern to avoid race conditions
             if model_name not in _hf_summarizers:
                 try:
-                    from transformers import pipeline
+                    from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+                    import torch
                     logger.info(f"Loading Hugging Face summarization model: {model_name} (this may take 30-60 seconds on first load)...")
                     logger.info("This is normal on first use - the model needs to be downloaded and loaded into memory.")
-                    _hf_summarizers[model_name] = pipeline("summarization", model=model_name)
+                    # Load model and tokenizer directly for better compatibility
+                    tokenizer = AutoTokenizer.from_pretrained(model_name)
+                    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+                    _hf_summarizers[model_name] = {
+                        'tokenizer': tokenizer,
+                        'model': model
+                    }
                     logger.info(f"Hugging Face summarization model {model_name} loaded successfully")
                 except Exception as e:
                     logger.error(f"Failed to initialize Hugging Face summarizer with {model_name}: {e}", exc_info=True)
@@ -105,6 +112,10 @@ def summarize_with_hf(text, max_length=300, min_length=50, model_name=None):
             logger.warning(f"Summarizer for {model_name} is not available (may still be loading)")
             return None
         
+        # Extract model and tokenizer
+        tokenizer = summarizer['tokenizer']
+        model = summarizer['model']
+        
         # For BART models, use more conservative limits to avoid errors
         if 'bart' in model_name.lower():
             # BART default max_length is 142 tokens, min_length is 56 tokens
@@ -114,20 +125,26 @@ def summarize_with_hf(text, max_length=300, min_length=50, model_name=None):
             effective_max_length = max_length
             effective_min_length = min_length
         
-        # Use max_new_tokens instead of max_length to avoid parameter conflicts
-        result = summarizer(
-            text, 
-            max_new_tokens=effective_max_length, 
-            min_length=effective_min_length, 
-            do_sample=False
+        # Tokenize input
+        inputs = tokenizer(text, return_tensors="pt", max_length=1024, truncation=True)
+        
+        # Generate summary
+        summary_ids = model.generate(
+            inputs["input_ids"],
+            max_length=effective_max_length,
+            min_length=effective_min_length,
+            num_beams=4,
+            length_penalty=2.0,
+            early_stopping=True
         )
         
-        if result and isinstance(result, list) and len(result) > 0:
-            summary = result[0].get('summary_text', '')
-            if summary:
-                summary = summary.strip()
-                logger.debug(f"Summary extracted successfully from {model_name}, length: {len(summary)} characters")
-                return summary
+        # Decode summary
+        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        
+        if summary:
+            summary = summary.strip()
+            logger.debug(f"Summary extracted successfully from {model_name}, length: {len(summary)} characters")
+            return summary
     except Exception as e:
         error_str = str(e).lower()
         # If the model fails with input length issues, try fallback model
