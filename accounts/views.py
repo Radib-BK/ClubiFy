@@ -41,6 +41,8 @@ class CustomLoginView(LoginView):
 
 
 class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('clubs:club_list')
+    
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             messages.info(request, 'You have been logged out.')

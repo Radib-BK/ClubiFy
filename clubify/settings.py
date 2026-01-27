@@ -167,7 +167,7 @@ LOGOUT_REDIRECT_URL = 'clubs:club_list'
 
 # Django-allauth settings (updated for allauth 0.61+)
 ACCOUNT_LOGIN_ON_GET = True
-ACCOUNT_LOGOUT_ON_GET = True  # Allow GET logout for simpler UX
+ACCOUNT_LOGOUT_ON_GET = False  # Require POST for logout (fixes Safari iOS issues with blank page)
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGIN_METHODS = {'username'}  # Login with username
 ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']  # * = required
