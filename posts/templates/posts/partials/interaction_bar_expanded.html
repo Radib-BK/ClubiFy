@@ -60,14 +60,28 @@ Context: post, club, membership (optional), is_liked (optional), like_count, com
         <div class="mb-8">
             {% include 'posts/partials/comment_form.html' with post=post club=club %}
         </div>
-        {% else %}
-        <!-- Login prompt for guests -->
+        {% elif user.is_authenticated %}
+        <!-- Membership prompt for authenticated non-members -->
         <div class="mb-8 p-6 bg-primary-50 rounded-2xl border border-primary-100 text-center">
             <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-white shadow-lg flex items-center justify-center">
                 <i class="fas fa-user-plus text-2xl text-primary-500"></i>
             </div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">Join the conversation!</h4>
             <p class="text-gray-600 text-sm mb-4">Become a member of this club to share your thoughts</p>
+            <a href="{% url 'clubs:club_detail' slug=club.slug %}" 
+               class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white text-sm font-semibold rounded-full hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                <i class="fas fa-users"></i>
+                Become a Member
+            </a>
+        </div>
+        {% else %}
+        <!-- Login prompt for guests -->
+        <div class="mb-8 p-6 bg-primary-50 rounded-2xl border border-primary-100 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-white shadow-lg flex items-center justify-center">
+                <i class="fas fa-sign-in-alt text-2xl text-primary-500"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Join the conversation!</h4>
+            <p class="text-gray-600 text-sm mb-4">Log in to comment on this post</p>
             <a href="{% url 'accounts:login' %}?next={{ request.path }}" 
                class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white text-sm font-semibold rounded-full hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                 <i class="fas fa-sign-in-alt"></i>

@@ -49,31 +49,31 @@
                     <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
                         {{ post.body|markdown_to_text|truncatewords:40 }}
                     </p>
-
-                    <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
-                        <div class="flex items-center gap-2">
-                            {% with profile_pic=post.author|profile_picture %}
-                            {% if profile_pic %}
-                            <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-                            {% else %}
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary-500">
-                                <span class="text-white font-semibold text-xs">
-                                    {{ post.author.username|slice:":1"|upper }}
-                                </span>
-                            </div>
-                            {% endif %}
-                            {% endwith %}
-                            <span class="text-sm text-gray-700 font-medium">{{ post.author.username }}</span>
-                        </div>
-                        <span class="text-gray-400">·</span>
-                        <span class="text-sm text-gray-500">{{ post.created_at|date:"M j, Y" }}</span>
-                        <span class="text-gray-400">·</span>
-                        <a href="{% url 'clubs:club_detail' slug=post.club.slug %}" class="text-sm text-primary-600 group-hover:text-primary-700 font-medium flex items-center gap-1">
-                            {{ post.club.name }}
-                            <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
-                        </a>
-                    </div>
                 </a>
+
+                <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center gap-2">
+                        {% with profile_pic=post.author|profile_picture %}
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="{{ post.author.username }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary-500">
+                            <span class="text-white font-semibold text-xs">
+                                {{ post.author.username|slice:":1"|upper }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        <span class="text-sm text-gray-700 font-medium">{{ post.author.username }}</span>
+                    </div>
+                    <span class="text-gray-400">·</span>
+                    <span class="text-sm text-gray-500">{{ post.created_at|date:"M j, Y" }}</span>
+                    <span class="text-gray-400">·</span>
+                    <a href="{% url 'clubs:club_detail' slug=post.club.slug %}" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
+                        {{ post.club.name }}
+                        <i class="fas fa-arrow-right text-xs transition-transform hover:translate-x-1"></i>
+                    </a>
+                </div>
             </article>
             {% endfor %}
         </div>
