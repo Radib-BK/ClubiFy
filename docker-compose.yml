@@ -45,6 +45,8 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-"*"}
+      # Hugging Face model cache directory
+      - HF_HOME=/app/.cache/huggingface
     ports:
       - "8001:8000"
       
@@ -60,6 +62,8 @@ services:
       - node_modules:/app/node_modules
       # Keep staticfiles volume for collected static files
       - static_volume:/app/staticfiles
+      # Persistent cache for Hugging Face models
+      - hf_cache:/app/.cache/huggingface
     # Use entrypoint script for development (runs Tailwind watch + Django runserver)
     # For production, override with: command: gunicorn --bind 0.0.0.0:8000 --workers 3 --threads 2 clubify.wsgi:application
 
@@ -67,3 +71,4 @@ volumes:
   postgres_data:
   static_volume:
   node_modules:
+  hf_cache:

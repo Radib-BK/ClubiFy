@@ -70,6 +70,20 @@ COPY --chown=appuser:appgroup . .
 # Install Node.js dependencies for Tailwind (cached if package.json doesn't change)
 RUN npm install
 
+# Pre-download Hugging Face model during build
+# Set proper permissions so appuser can access the cache
+ENV HF_HOME=/app/.cache/huggingface
+
+RUN mkdir -p ${HF_HOME} && \
+    python -c "import os; os.environ['HF_HOME']='${HF_HOME}'; \
+    from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; \
+    print('Downloading tokenizer...'); \
+    AutoTokenizer.from_pretrained('sshleifer/distilbart-cnn-12-6'); \
+    print('Downloading model...'); \
+    AutoModelForSeq2SeqLM.from_pretrained('sshleifer/distilbart-cnn-12-6'); \
+    print('✓ Model downloaded successfully')" && \
+    chown -R appuser:appgroup ${HF_HOME}
+
 # Copy and set up entrypoint script
 COPY --chown=appuser:appgroup docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
