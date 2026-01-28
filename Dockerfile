@@ -73,14 +73,16 @@ RUN npm install
 # Pre-download Hugging Face model during build
 # Set proper permissions so appuser can access the cache
 ENV HF_HOME=/app/.cache/huggingface
+ENV HF_SUMMARIZATION_MODEL=sshleifer/distilbart-cnn-12-6
 
 RUN mkdir -p ${HF_HOME} && \
-    python -c "import os; os.environ['HF_HOME']='${HF_HOME}'; \
+    python -c "import os; \
+    model_name = os.getenv('HF_SUMMARIZATION_MODEL', 'sshleifer/distilbart-cnn-12-6'); \
+    os.environ['HF_HOME'] = '${HF_HOME}'; \
     from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; \
-    print('Downloading tokenizer...'); \
-    AutoTokenizer.from_pretrained('sshleifer/distilbart-cnn-12-6'); \
-    print('Downloading model...'); \
-    AutoModelForSeq2SeqLM.from_pretrained('sshleifer/distilbart-cnn-12-6'); \
+    print(f'Downloading {model_name}...'); \
+    AutoTokenizer.from_pretrained(model_name); \
+    AutoModelForSeq2SeqLM.from_pretrained(model_name); \
     print('✓ Model downloaded successfully')" && \
     chown -R appuser:appgroup ${HF_HOME}
 

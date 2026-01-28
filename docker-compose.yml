@@ -45,8 +45,9 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-"*"}
-      # Hugging Face model cache directory
+      # Hugging Face model settings
       - HF_HOME=/app/.cache/huggingface
+      - HF_SUMMARIZATION_MODEL=${HF_SUMMARIZATION_MODEL:-sshleifer/distilbart-cnn-12-6}
     ports:
       - "8001:8000"
       
