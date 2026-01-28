@@ -198,40 +198,65 @@ Admin panel at `http://localhost:8000/admin`
 
 ### Option 2: Docker Setup (Recommended)
 
-The entrypoint auto-runs migrations and Tailwind watch. Use these commands:
+#### Prerequisites
+- Docker & Docker Compose installed
 
-```bash
-# Start (first time or after Dockerfile changes)
-docker-compose up -d --build
+#### Setup
 
-# Follow logs (Django + Tailwind)
-docker-compose logs -f web
+1. **Create `.env` file** (optional, but recommended):
+   ```bash
+   # Copy the existing .env or create one with these values:
+   SECRET_KEY=your-secret-key
+   DEBUG=True
+   DB_NAME=
+   DB_USER=
+   DB_PASSWORD=
+   GOOGLE_CLIENT_ID=your-id
+   GOOGLE_CLIENT_SECRET=your-secret
+   HF_SUMMARIZATION_MODEL=sshleifer/distilbart-cnn-12-6
+   ```
+   
+   **Note:** `.env` is **optional** - if not provided, defaults are used.
 
-# Create admin user
-docker-compose exec web python manage.py createsuperuser
-```
+2. **Build and start containers**:
+   ```bash
+   docker-compose build web  # First time (downloads Hugging Face model ~5 min)
+   docker-compose up -d       # Start all services
+   ```
 
-Access:
+3. **Create admin user**:
+   ```bash
+   docker-compose exec web python manage.py createsuperuser
+   ```
+
+#### Access
 - App: http://localhost:8001
 - Admin: http://localhost:8001/admin
-- PostgreSQL: exposed on 5433 (container 5432)
+- PostgreSQL: localhost:5433
 
-Notes:
-- Code changes auto-reload; Tailwind auto-compiles.
-- To stop: `docker-compose down` (add `-v` to drop DB volume).
-- **AI Summarizer**: The Hugging Face model (`sshleifer/distilbart-cnn-12-6`) is preloaded at startup for fast summarization. First startup may take 20-40 seconds to download and load the model.
-
-### Configuration
-
-You can customize the summarizer via environment variables:
-
+#### Common Commands
 ```bash
-# Optional: Override the default model (default: sshleifer/distilbart-cnn-12-6)
-HF_SUMMARIZATION_MODEL=sshleifer/distilbart-cnn-12-6
+# View logs
+docker-compose logs -f web
 
-# Optional: Skip preloading (models load on first request instead of at startup)
-SKIP_SUMMARIZER_PRELOAD=false
+# Stop containers
+docker-compose down
+
+# Rebuild after code changes
+docker-compose build web && docker-compose up -d
+
+# Run Django commands
+docker-compose exec web python manage.py <command>
 ```
+
+#### About the AI Summarizer
+- The Hugging Face model is **pre-downloaded during the first build** (takes ~5 minutes)
+- Model is **cached in Docker volume** for fast subsequent starts
+- To change model, edit `.env`:
+  ```env
+  HF_SUMMARIZATION_MODEL=facebook/bart-large-cnn
+  ```
+  Then rebuild: `docker-compose build web`
 
 ---
 
