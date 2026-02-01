@@ -23,6 +23,7 @@
 - Role-based memberships (Admin, Moderator, Member)
 - Membership requests with approve / reject workflow
 - Publish blog posts (members) and news posts (mods / admins)
+- Bookmark important posts
 - Delete posts (mods/admins) and remove members (admins)
 - **Like, Comment & Share** on posts
 - AI post summarizer
