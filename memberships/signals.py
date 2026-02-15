@@ -16,6 +16,5 @@ def create_admin_membership(sender, instance, created, **kwargs):
         Membership.objects.get_or_create(
             user=instance.created_by,
             club=instance,
-            defaults={'role': RoleChoices.ADMIN}
+            defaults={"role": RoleChoices.ADMIN},
         )
-

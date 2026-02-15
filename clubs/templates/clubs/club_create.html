@@ -43,9 +43,31 @@
                 <label for="id_logo" class="label">
                     Club Logo <span class="text-gray-400 text-sm font-normal">(optional)</span>
                 </label>
-                {{ form.logo }}
+                
+                <div>
+                    <label for="id_logo" class="relative block">
+                        <input type="file" name="logo" id="id_logo" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                        <div class="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer group">
+                            <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                <i class="fas fa-cloud-upload-alt text-primary-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-700 group-hover:text-primary-700">
+                                    <span id="file-label">Choose a logo file</span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5 hidden" id="file-name"></p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md group-hover:border-primary-300 group-hover:text-primary-700">
+                                    Browse
+                                </span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
                 {% if form.logo.help_text %}
-                    <p class="text-gray-500 text-sm mt-1">{{ form.logo.help_text }}</p>
+                    <p class="text-gray-500 text-sm mt-2">{{ form.logo.help_text }}</p>
                 {% endif %}
                 {% if form.logo.errors %}
                     <p class="text-red-600 text-sm mt-1">{{ form.logo.errors.0 }}</p>
@@ -56,9 +78,31 @@
                 <label for="id_banner" class="label">
                     Banner Image <span class="text-gray-400 text-sm font-normal">(optional)</span>
                 </label>
-                {{ form.banner }}
+                
+                <div>
+                    <label for="id_banner" class="relative block">
+                        <input type="file" name="banner" id="id_banner" accept="image/*" class="hidden" onchange="handleBannerSelect(this)">
+                        <div class="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer group">
+                            <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                                <i class="fas fa-image text-primary-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-700 group-hover:text-primary-700">
+                                    <span id="banner-file-label">Choose a banner image</span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5 hidden" id="banner-file-name"></p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md group-hover:border-primary-300 group-hover:text-primary-700">
+                                    Browse
+                                </span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
                 {% if form.banner.help_text %}
-                    <p class="text-gray-500 text-sm mt-1">{{ form.banner.help_text }}</p>
+                    <p class="text-gray-500 text-sm mt-2">{{ form.banner.help_text }}</p>
                 {% endif %}
                 {% if form.banner.errors %}
                     <p class="text-red-600 text-sm mt-1">{{ form.banner.errors.0 }}</p>
@@ -152,6 +196,38 @@
 </div>
 
 <script>
+function handleFileSelect(input) {
+    const fileName = input.files[0]?.name || '';
+    const fileLabel = document.getElementById('file-label');
+    const fileNameDisplay = document.getElementById('file-name');
+    
+    if (fileName) {
+        fileLabel.textContent = 'Selected file:';
+        fileNameDisplay.textContent = fileName;
+        fileNameDisplay.classList.remove('hidden');
+    } else {
+        fileLabel.textContent = 'Choose a logo file';
+        fileNameDisplay.textContent = '';
+        fileNameDisplay.classList.add('hidden');
+    }
+}
+
+function handleBannerSelect(input) {
+    const fileName = input.files[0]?.name || '';
+    const fileLabel = document.getElementById('banner-file-label');
+    const fileNameDisplay = document.getElementById('banner-file-name');
+    
+    if (fileName) {
+        fileLabel.textContent = 'Selected file:';
+        fileNameDisplay.textContent = fileName;
+        fileNameDisplay.classList.remove('hidden');
+    } else {
+        fileLabel.textContent = 'Choose a banner image';
+        fileNameDisplay.textContent = '';
+        fileNameDisplay.classList.add('hidden');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const colorRadios = document.querySelectorAll('.color-radio');
     const colorOptions = document.querySelectorAll('.color-option');

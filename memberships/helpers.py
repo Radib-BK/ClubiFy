@@ -2,6 +2,7 @@
 Role and permission helper functions for ClubiFy.
 Use these to check user permissions in views and templates.
 """
+
 from .models import Membership, MembershipRequest, RoleChoices, RequestStatus
 
 
@@ -46,13 +47,11 @@ def has_pending_request(user, club):
     if not user.is_authenticated:
         return False
     return MembershipRequest.objects.filter(
-        user=user,
-        club=club,
-        status=RequestStatus.PENDING
+        user=user, club=club, status=RequestStatus.PENDING
     ).exists()
 
 
-def can_create_post(user, club, post_type='blog'):
+def can_create_post(user, club, post_type="blog"):
     """
     Check if user can create a specific type of post.
     - blog: any member
@@ -61,9 +60,8 @@ def can_create_post(user, club, post_type='blog'):
     membership = get_membership(user, club)
     if not membership:
         return False
-    
-    if post_type == 'news':
-        return membership.role in [RoleChoices.ADMIN, RoleChoices.MODERATOR]
-    
-    return True  # Any member can create blog posts
 
+    if post_type == "news":
+        return membership.role in [RoleChoices.ADMIN, RoleChoices.MODERATOR]
+
+    return True  # Any member can create blog posts

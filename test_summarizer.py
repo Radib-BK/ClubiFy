@@ -1,12 +1,12 @@
 """
 Test script for the summarization feature.
 """
+
 import os
-import sys
 import django
 
 # Setup Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'clubify.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "clubify.settings")
 django.setup()
 
 from posts.utils.summarizer import summarize_with_hf
@@ -37,7 +37,7 @@ print("=" * 80)
 
 try:
     summary = summarize_with_hf(test_text, max_length=100, min_length=30)
-    
+
     if summary:
         print("\n✓ Summarization successful!")
         print("=" * 80)
@@ -48,8 +48,9 @@ try:
     else:
         print("\n✗ Summarization returned None")
         print("Check the logs for errors")
-        
+
 except Exception as e:
     print(f"\n✗ Error during summarization: {e}")
     import traceback
+
     traceback.print_exc()

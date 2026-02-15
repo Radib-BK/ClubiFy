@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('clubs', '0001_initial'),
+        ("clubs", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='club',
-            name='color',
-            field=models.CharField(blank=True, help_text='Card background color (auto-generated)', max_length=7),
+            model_name="club",
+            name="color",
+            field=models.CharField(
+                blank=True,
+                help_text="Card background color (auto-generated)",
+                max_length=7,
+            ),
         ),
     ]
