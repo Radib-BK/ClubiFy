@@ -524,11 +524,9 @@ def toggle_bookmark(request, slug, post_id):
 
     if existing_bookmark:
         existing_bookmark.delete()
-        is_bookmarked = False
         messages.success(request, "Post removed from bookmarks.")
     else:
         Bookmark.objects.create(post=post, user=request.user)
-        is_bookmarked = True
         messages.success(request, "Post bookmarked!")
 
     return redirect("posts:post_detail", slug=slug, post_id=post_id)
